@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Prescriptions</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(to right, #eef2f3, #dfe9f3);
+        }
+
+        .card {
+            margin-top: 50px;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .title {
+            color: #0a6e6e;
+            font-weight: 600;
+        }
+
+        .table thead {
+            background-color: #0a6e6e;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <h3 class="title mb-4">
+            💊 Prescriptions for Medication :
+            <span th:text="${medicationName}"></span>
+        </h3>
+
+        <table class="table table-hover text-center align-middle">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Physician</th>
+                    <th>Patient</th>
+                    <th>Dose</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="p, iterStat : ${prescriptions}">
+    
+                    <td th:text="${(currentPage != null ? currentPage : 0) * (size != null ? size : 10) + iterStat.index + 1}"></td>
+
+                    <td th:text="${p.physicianName}"></td>
+                    <td th:text="${p.patientName}"></td>
+                    <td th:text="${p.dose}"></td>
+                    <td th:text="${p.date}"></td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(prescriptions)}">
+                    <td colspan="5">No prescriptions found</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-2">
+
+            <!-- Page Info -->
+            <span>
+                Showing page 
+                <b th:text="${(currentPage != null ? currentPage : 0) + 1}"></b> 
+                of 
+                <b th:text="${totalPages != null ? totalPages : 1}"></b>
+            </span>
+
+            <div class="d-flex flex-wrap gap-1">
+
+                <!-- Previous -->
+                <a th:if="${currentPage != null and currentPage > 0}"
+                th:href="@{/prescriptions(medicationId=${medicationId}, page=${currentPage - 1})}"
+                class="btn btn-outline-secondary btn-sm">
+                    Previous
+                </a>
+
+                <!-- Page Numbers -->
+                <span th:each="i : ${#numbers.sequence(0, (totalPages != null ? totalPages : 1) - 1)}">
+                    
+                    <a th:href="@{/prescriptions(medicationId=${medicationId}, page=${i})}"
+                    th:text="${i + 1}"
+                    th:class="${i == currentPage} ? 'btn btn-primary btn-sm' : 'btn btn-outline-secondary btn-sm'">
+                    </a>
+
+                </span>
+
+                <!-- Next -->
+                <a th:if="${currentPage != null and totalPages != null and currentPage < totalPages - 1}"
+                th:href="@{/prescriptions(medicationId=${medicationId}, page=${currentPage + 1})}"
+                class="btn btn-outline-secondary btn-sm">
+                    Next
+                </a>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

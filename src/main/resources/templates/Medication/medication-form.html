@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Medication Form</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            padding-top: 60px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            width: 420px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #0a6e6e;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #0a6e6e;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <h2 th:text="${medication.code} != null ? 'Edit Medication' : 'Add Medication'"></h2>
+
+    <form th:action="@{/medications/save}" th:object="${medication}" method="post">
+
+        <!-- Show only in ADD -->
+        <div class="mb-3" th:if="${!isEdit}">
+            <label>Code</label>
+            <input type="number" th:field="*{code}" class="form-control" required />
+        </div>
+
+        <!-- Hidden field for EDIT (to preserve ID) -->
+        <input type="hidden" th:if="${isEdit}" th:field="*{code}" />
+
+        <input type="text" th:field="*{name}" placeholder="Medication Name" required>
+        <input type="text" th:field="*{brand}" placeholder="Brand" required>
+        <input type="text" th:field="*{description}" placeholder="Description" required>
+
+        <button type="submit">Save</button>
+
+    </form>
+
+    <a href="/medications" class="back">← Back</a>
+
+</div>
+
+</body>
+</html>
