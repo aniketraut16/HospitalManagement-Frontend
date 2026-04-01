@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{DepartmentAndPhysician/fragments :: head('Departments')}"></head>
+<body class="bg-slate-50 text-slate-600 font-sans min-h-screen selection:bg-teal-100 selection:text-teal-900 antialiased">
+<div class="flex h-screen overflow-hidden">
+
+    <nav th:replace="~{DepartmentAndPhysician/fragments :: sidebar(${activePage})}"></nav>
+
+    <main class="flex-1 ml-64 overflow-y-auto relative">
+        <div class="max-w-7xl mx-auto p-8 lg:p-12">
+
+            <!-- Flash Messages -->
+            <div th:if="${success}" class="mb-6 animate-fade-in-down">
+                <div class="flex items-center gap-3 px-4 py-3 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg shadow-sm">
+                    <i class="fa-solid fa-circle-check text-lg"></i>
+                    <span class="text-sm font-medium" th:text="${success}"></span>
+                </div>
+            </div>
+            
+            <div th:if="${error}" class="mb-6 animate-fade-in-down">
+                <div class="flex items-center gap-3 px-4 py-3 bg-red-50 text-red-700 border border-red-200 rounded-lg shadow-sm">
+                    <i class="fa-solid fa-circle-exclamation text-lg"></i>
+                    <span class="text-sm font-medium" th:text="${error}"></span>
+                </div>
+            </div>
+
+            <!-- Page Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold font-sans tracking-tight text-slate-800 mb-1">Department Directory</h2>
+                    <p class="text-slate-500 text-sm">Manage hospital departments and their respective heads</p>
+                </div>
+                <div>
+                    <a th:href="@{/departments/new}" class="btn-primary whitespace-nowrap shadow-md">
+                        <i class="fa-solid fa-plus font-bold"></i> Add Department
+                    </a>
+                </div>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                <!-- Total Departments Card -->
+                <div class="glass-card p-6 flex items-center gap-4 border-l-4 border-l-teal-600">
+                    <div class="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-building text-teal-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-1">Total Departments</p>
+                        <h3 class="text-2xl font-bold text-slate-800 leading-none" th:text="${totalElements}">0</h3>
+                    </div>
+                </div>
+
+                <!-- Total Pages Card -->
+                <div class="glass-card p-6 flex items-center gap-4 border-l-4 border-l-emerald-600">
+                    <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-layer-group text-emerald-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-1">Total Pages</p>
+                        <h3 class="text-2xl font-bold text-slate-800 leading-none" th:text="${totalPages}">0</h3>
+                    </div>
+                </div>
+
+                <!-- Current Page Card -->
+                <div class="glass-card p-6 flex items-center gap-4 border-l-4 border-l-blue-600">
+                    <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-location-crosshairs text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-1">Current Page</p>
+                        <h3 class="text-2xl font-bold text-slate-800 leading-none">
+                            <span th:text="${currentPage + 1}">1</span>
+                            <span class="text-sm font-medium text-slate-400" th:text="'/ ' + ${totalPages}">/ 1</span>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container shadow-sm border border-slate-200/80 mb-8 rounded-xl bg-white overflow-hidden">
+                <table class="w-full" th:if="${!#lists.isEmpty(departments)}">
+                    <thead>
+                    <tr>
+                        <th class="table-th text-center w-16">Sr.No</th>
+                        <th class="table-th text-left w-32">Dept ID</th>
+                        <th class="table-th">Department Name</th>
+                        <th class="table-th">Head of Department</th>
+                        <th class="table-th text-right w-48">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                    <tr th:each="d, stat : ${departments}" th:class="${stat.index % 2 == 1} ? 'bg-slate-50/50 hover:bg-slate-50/80 transition-colors' : 'bg-white hover:bg-slate-50/80 transition-colors'">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 text-center font-medium" th:text="${(currentPage * 10) + stat.count}">1</td>
+                        
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <input type="text" th:value="${d.departmentId}" readonly class="w-full text-sm px-3 py-1.5 border border-slate-200 text-slate-500 rounded font-mono bg-white outline-none cursor-default shadow-sm" />
+                        </td>
+
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-700" th:text="${d.name}">
+                            Cardiology
+                        </td>
+                        
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <span class="inline-flex items-center px-4 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm" th:text="${d.headName}">Dr. Smith</span>
+                        </td>
+                        
+                        <td class="px-6 py-4 flex items-center justify-end gap-2">
+                            <a th:href="@{/departments/{id}/edit(id=${d.departmentId})}"
+                               class="icon-btn bg-white !text-teal-700 hover:!bg-teal-50 border border-teal-200 gap-1.5 px-3 py-1.5">
+                                <i class="fa-solid fa-pen fa-sm"></i> Edit
+                            </a>
+                            <form th:action="@{/departments/{id}/delete(id=${d.departmentId})}" method="post" class="inline" onsubmit="return confirm('Are you sure you want to delete this department?');">
+                                <button type="submit" class="icon-btn-danger gap-1.5 px-3 py-1.5">
+                                    <i class="fa-solid fa-trash fa-sm"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(departments)}" class="py-16 px-6 text-center bg-slate-50">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white border border-slate-200 shadow-sm text-slate-400 text-2xl mb-4">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+                    <h4 class="text-lg font-bold text-slate-800 mb-2">No departments found</h4>
+                    <p class="text-slate-500 text-sm mb-6">No department records are currently available. Add your first!</p>
+                    <a th:href="@{/departments/new}" class="btn-primary">
+                        <i class="fa-solid fa-plus font-bold"></i> Add Department
+                    </a>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div th:if="${totalPages > 1}" class="flex items-center justify-center gap-4 py-4 w-full text-sm">
+                
+                <a th:if="${currentPage > 0}"
+                   th:href="@{/departments(page=${currentPage - 1}, size=10)}"
+                   class="inline-flex items-center font-bold text-teal-700 hover:text-teal-800 px-4 py-2 bg-white rounded-lg shadow-sm border border-slate-200 active:scale-95 transition-all">
+                    ← Prev
+                </a>
+
+                <div class="text-slate-500">
+                    Page <strong class="text-slate-800" th:text="${currentPage + 1}">1</strong> of <strong class="text-slate-800" th:text="${totalPages}">6</strong>
+                </div>
+
+                <a th:if="${currentPage < totalPages - 1}"
+                   th:href="@{/departments(page=${currentPage + 1}, size=10)}"
+                   class="inline-flex items-center font-bold text-teal-700 hover:text-teal-800 px-4 py-2 bg-white rounded-lg shadow-sm border border-slate-200 active:scale-95 transition-all">
+                    Next →
+                </a>
+
+            </div>
+
+        </div>
+    </main>
+</div>
+</body>
+</html>

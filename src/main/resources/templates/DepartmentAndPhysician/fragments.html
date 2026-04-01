@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- ═══ HEAD Fragment ═══ -->
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hospital Management System — Physician Dashboard">
+    <title th:text="${title} + ' — HMS'">HMS</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- TAILWIND CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        teal: {
+                            600: '#0d9488',
+                            700: '#11706b', // The exact dark teal from the image
+                            800: '#115e59',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass-card {
+                @apply bg-white border border-slate-200 shadow-sm rounded-xl;
+            }
+            .text-heading {
+                @apply text-slate-900 font-bold tracking-tight;
+            }
+            .input-field {
+                @apply w-full bg-white border border-slate-300 rounded-md px-4 py-2.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all text-sm shadow-sm;
+            }
+            .btn-primary {
+                @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-medium rounded-md shadow-sm transition-all active:scale-95 text-sm;
+            }
+            .btn-secondary {
+                @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-medium rounded-md shadow-sm transition-all active:scale-95 text-sm;
+            }
+            .btn-danger {
+                @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-red-50 border border-red-200 text-red-600 font-medium rounded-md shadow-sm transition-all active:scale-95 text-sm;
+            }
+            .badge-primary {
+                @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600 border border-emerald-100;
+            }
+            .badge-secondary {
+                @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200;
+            }
+            .table-container {
+                @apply w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm;
+            }
+            .table-th {
+                @apply px-6 py-4 text-left text-[11px] font-bold text-white uppercase tracking-widest bg-teal-700 border-none;
+            }
+            .table-td {
+                @apply px-6 py-4 whitespace-nowrap text-sm text-slate-700 border-b border-slate-100 transition-colors;
+            }
+            .table-tr {
+                @apply hover:bg-slate-50/80 transition-colors bg-white;
+            }
+            /* Specific icon button matching the 'Update' button style requested */
+            .icon-btn {
+                @apply inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-teal-700 hover:bg-teal-800 text-white text-xs font-medium transition-colors active:scale-95 shadow-sm;
+            }
+            .icon-btn-danger {
+                @apply inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-white hover:bg-red-50 text-red-600 border border-red-200 text-xs font-medium transition-colors active:scale-95 shadow-sm;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-600 font-sans min-h-screen selection:bg-teal-100 selection:text-teal-900 antialiased">
+
+<!-- ═══ SIDEBAR Fragment ═══ -->
+<nav th:fragment="sidebar(activePage)" class="fixed inset-y-0 left-0 w-64 bg-white border-r border-slate-200 flex flex-col z-50 shadow-sm">
+    
+    <div class="px-6 py-8 flex items-center gap-4 border-b border-slate-100">
+        <div class="w-10 h-10 rounded-xl bg-teal-700 flex items-center justify-center shadow-md shadow-teal-700/20 shrink-0">
+            <i class="fa-solid fa-hospital text-white text-lg"></i>
+        </div>
+        <div>
+            <h1 class="text-lg font-bold text-slate-800 tracking-tight leading-none mb-1">HMS</h1>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Hospital Mgmt</span>
+        </div>
+    </div>
+
+    <div class="flex-1 px-4 py-6 space-y-1">
+        <div class="px-2 mb-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Navigation</div>
+
+        <a th:href="@{/physicians}"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group relative overflow-hidden"
+           th:classappend="${activePage == 'physicians'} ? 'text-teal-700 bg-teal-50' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'">
+            <div th:if="${activePage == 'physicians'}" class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-teal-700 rounded-r-full"></div>
+            <i class="fa-solid fa-user-doctor w-5 text-center group-hover:scale-110 transition-transform"></i>
+            <span>Physicians</span>
+        </a>
+
+    </div>
+
+    <div class="p-5 border-t border-slate-100">
+        <div class="flex items-center justify-center gap-2 text-xs text-slate-500 font-medium bg-slate-50 py-2.5 rounded-lg border border-slate-200">
+            <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+            Backend Connected
+        </div>
+    </div>
+</nav>
+
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{DepartmentAndPhysician/fragments :: head(${isEdit} ? 'Edit Department' : 'Add Department')}"></head>
+<body class="bg-slate-50 text-slate-600 font-sans min-h-screen selection:bg-teal-100 selection:text-teal-900 antialiased">
+<div class="flex h-screen overflow-hidden">
+
+    <nav th:replace="~{DepartmentAndPhysician/fragments :: sidebar('departments')}"></nav>
+
+    <main class="flex-1 ml-64 overflow-y-auto relative p-8 lg:p-12 flex items-center justify-center">
+        
+        <div class="w-full max-w-2xl relative">
+
+            <!-- Back link -->
+            <div class="mb-6 relative z-10">
+                <a th:href="@{/departments}" class="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-teal-700 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Directory
+                </a>
+            </div>
+
+            <!-- Form Card -->
+            <div class="glass-card overflow-hidden relative z-10 shadow-lg">
+                
+                <div class="px-8 py-6 border-b border-slate-100 bg-teal-700 text-white">
+                    <h2 class="text-2xl font-bold tracking-tight flex items-center gap-3">
+                        <i class="fa-solid fa-building text-teal-100"></i>
+                        <span th:text="${isEdit} ? 'Edit Department Details' : 'Register New Department'">Header</span>
+                    </h2>
+                    <p class="text-teal-100 text-sm mt-1">Provide information about the clinical department.</p>
+                </div>
+
+                <div class="p-8 bg-white">
+                    <!-- Form Errors (Global) -->
+                    <div th:if="${error}" class="mb-6 animate-fade-in-down">
+                        <div class="flex items-start gap-3 px-4 py-3 bg-red-50 text-red-700 border border-red-200 rounded-lg shadow-sm text-sm">
+                            <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
+                            <span th:text="${error}"></span>
+                        </div>
+                    </div>
+
+                    <form th:action="@{${isEdit} ? '/departments/' + ${department.departmentId} + '/edit' : '/departments/new'}"
+                          th:object="${department}" method="post" class="space-y-6">
+
+                        <!-- Department ID -->
+                        <div>
+                            <label for="departmentId" class="block text-sm font-bold text-slate-700 mb-2">Department ID</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-hashtag"></i>
+                                </span>
+                                <input type="number" id="departmentId" th:field="*{departmentId}" required
+                                       class="input-field !pl-12"
+                                       th:readonly="${isEdit}"
+                                       th:classappend="${isEdit ? 'opacity-70 cursor-not-allowed bg-slate-50 border-slate-200' : ''}"
+                                       placeholder="e.g. 101">
+                            </div>
+                            <p th:if="${#fields.hasErrors('departmentId')}" th:errors="*{departmentId}" class="text-red-500 text-xs mt-1 font-medium"></p>
+                            <p th:if="${isEdit}" class="text-slate-400 text-xs mt-1"><i class="fa-solid fa-lock text-[10px] mr-1"></i> Department ID cannot be changed once assigned.</p>
+                        </div>
+
+                        <!-- Name -->
+                        <div>
+                            <label for="name" class="block text-sm font-bold text-slate-700 mb-2">Department Name</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-building"></i>
+                                </span>
+                                <input type="text" id="name" th:field="*{name}" required
+                                       class="input-field !pl-12"
+                                       placeholder="e.g. Cardiology">
+                            </div>
+                            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-red-500 text-xs mt-1 font-medium"></p>
+                        </div>
+
+                        <!-- Head Name -->
+                        <div>
+                            <label for="headName" class="block text-sm font-bold text-slate-700 mb-2">Head of Department (Name)</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-user-tie"></i>
+                                </span>
+                                <input type="text" id="headName" th:field="*{headName}" required
+                                       class="input-field !pl-12"
+                                       placeholder="e.g. Dr. Jonathan Smith">
+                            </div>
+                            <p th:if="${#fields.hasErrors('headName')}" th:errors="*{headName}" class="text-red-500 text-xs mt-1 font-medium"></p>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
+                            <a th:href="@{/departments}" class="btn-secondary">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn-primary">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span th:text="${isEdit} ? 'Save Changes' : 'Create Department'">Save</span>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+</div>
+</body>
+</html>

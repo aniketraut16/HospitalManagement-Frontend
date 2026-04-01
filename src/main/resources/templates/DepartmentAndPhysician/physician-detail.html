@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{DepartmentAndPhysician/fragments :: head('Physician Details')}"></head>
+<body class="bg-slate-50 text-slate-600 font-sans min-h-screen selection:bg-teal-100 selection:text-teal-900 antialiased">
+<div class="flex h-screen overflow-hidden">
+
+    <nav th:replace="~{DepartmentAndPhysician/fragments :: sidebar('physicians')}"></nav>
+
+    <main class="flex-1 ml-64 overflow-y-auto relative">
+        <div class="max-w-4xl mx-auto p-8 lg:p-12">
+
+            <!-- Back navigation -->
+            <div class="mb-6">
+                <a th:href="@{/physicians}" class="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-teal-700 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Directory
+                </a>
+            </div>
+
+            <!-- Profile Header Card -->
+            <div class="glass-card overflow-hidden mb-8 relative">
+                <!-- Top banner -->
+                <div class="h-32 bg-teal-700 border-b border-teal-800 relative">
+                    <div class="absolute inset-0 bg-white opacity-5 mix-blend-overlay"></div>
+                    <div class="absolute -bottom-10 left-8">
+                        <!-- Avatar -->
+                        <div class="w-24 h-24 rounded-full bg-white border-4 border-white flex items-center justify-center shadow-md relative group overflow-hidden">
+                            <div class="absolute inset-0 bg-teal-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <i class="fa-solid fa-user-doctor text-4xl text-teal-700 relative z-10 group-hover:scale-110 transition-transform duration-300"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Section -->
+                <div class="px-8 pt-14 pb-8">
+                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
+                        <div>
+                            <h2 class="text-3xl font-bold text-slate-800 tracking-tight mb-1" th:text="${physician.name}">Dr. John Doe</h2>
+                            
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="inline-flex items-center px-4 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm" th:text="${physician.position}">Head Surgeon</span>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-4 text-sm mt-3">
+                                <div class="flex items-center gap-2 text-slate-500 bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200">
+                                    <i class="fa-solid fa-fingerprint text-teal-700"></i>
+                                    <span>SSN: <strong class="text-slate-700 font-mono" th:text="${physician.ssn}">***-**-****</strong></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Top Actions -->
+                        <div class="flex gap-2">
+                            <a th:href="@{/physicians/{id}/edit(id=${physician.employeeId})}" class="btn-primary whitespace-nowrap !py-2 !px-4 shadow-sm">
+                                <i class="fa-solid fa-pen text-xs"></i> Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Affiliations Section -->
+            <div class="mb-4">
+                <h3 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2">
+                    <i class="fa-solid fa-network-wired text-teal-700"></i>
+                    Department Affiliations
+                </h3>
+            </div>
+
+            <div class="table-container shadow-sm border border-slate-200/80 mb-8 rounded-xl bg-white overflow-hidden">
+                <table class="w-full" th:if="${!#lists.isEmpty(affiliations)}">
+                    <thead>
+                    <tr>
+                        <th class="table-th text-left">Department</th>
+                        <th class="table-th w-32">Status</th>
+                        <th class="table-th">Head of Department</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                    <tr th:each="aff, stat : ${affiliations}" th:class="${stat.index % 2 == 1} ? 'bg-slate-50/50 hover:bg-slate-50/80 transition-colors' : 'bg-white hover:bg-slate-50/80 transition-colors'">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-700">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-teal-50 border border-teal-100 text-teal-700 flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-building"></i>
+                                </div>
+                                <span th:text="${aff.departmentName}">Cardiology</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <span th:if="${aff.primaryAffiliation}" class="badge-primary shadow-sm">
+                                <i class="fa-solid fa-star text-[10px] mr-1"></i> Primary
+                            </span>
+                            <span th:unless="${aff.primaryAffiliation}" class="badge-secondary shadow-sm">Secondary</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 text-slate-400 text-[10px] shrink-0">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                                <span th:text="${aff.departmentHeadName}">Dr. Smith</span>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- Empty State for Affiliations -->
+                <div th:if="${#lists.isEmpty(affiliations)}" class="py-12 px-6 text-center bg-slate-50">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white border border-slate-200 shadow-sm text-slate-400 text-lg mb-3">
+                        <i class="fa-solid fa-building-circle-xmark"></i>
+                    </div>
+                    <h5 class="text-base font-bold text-slate-700 mb-1">No Affiliations</h5>
+                    <p class="text-slate-500 text-sm">This physician is currently not assigned to any departments.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+</body>
+</html>
