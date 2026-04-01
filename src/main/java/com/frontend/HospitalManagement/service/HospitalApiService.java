@@ -45,35 +45,8 @@ public class HospitalApiService {
     }
 
     public Map<String, Object> searchPhysicianBySsn(int ssn) {
-        String url = backendUrl + "/allPhysician/search/findBySsn?ssn=" + ssn;
-        try {
-            String response = restTemplate.getForObject(url, String.class);
-            JsonNode node = objectMapper.readTree(response);
-
-            Integer id = null;
-            if (node.has("employeeId")) {
-                id = node.get("employeeId").asInt();
-            } else {
-                String selfHref = node.path("_links").path("self").path("href").asText("");
-                id = extractIdFromHref(selfHref);
-            }
-            PhysicianDTO physician = mapToPhysicianDTO(node, id);
-
-            Map<String, Object> result = new LinkedHashMap<>();
-            result.put("physicians", Collections.singletonList(physician));
-            result.put("currentPage", 0);
-            result.put("totalPages", 1);
-            result.put("totalElements", 1L);
-            return result;
-        } catch (Exception e) {
-            Map<String, Object> empty = new LinkedHashMap<>();
-            empty.put("physicians", Collections.emptyList());
-            empty.put("currentPage", 0);
-            empty.put("totalPages", 1);
-            empty.put("totalElements", 0L);
-            empty.put("error", "Physician with SSN " + ssn + " not found.");
-            return empty;
-        }
+        String url = backendUrl + "/allPhysician/search/findBySsnContaining?ssn=" + ssn + "&page=0&size=10";
+        return fetchPhysicianPage(url);
     }
 
     public PhysicianDTO getPhysicianById(Integer id) {

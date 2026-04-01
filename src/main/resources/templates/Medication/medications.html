@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Medications</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        .font-serif-dm { font-family: 'DM Serif Display', serif; }
+        body { font-family: 'DM Sans', sans-serif; background: #f0f4f8; color: #1a202c; }
+    </style>
+</head>
+
+<body class="min-h-screen py-10 flex flex-col items-center px-4">
+
+    <!-- 🔷 Breadcrumb -->
+    <div class="w-full max-w-[960px] mb-6 flex items-center text-[0.95rem] font-medium text-[#718096]">
+        <a href="/" class="hover:text-[#0a6e6e] flex items-center gap-1.5">
+            🏠 Home
+        </a>
+        <span class="mx-2 text-[#cbd5e0]">/</span>
+        <span class="text-[#1a202c]">Medications</span>
+    </div>
+
+    <!-- 🔷 Title -->
+    <div class="w-full max-w-[960px] mb-6 text-center">
+        <h1 class="text-[2.4rem] text-[#0a6e6e] font-serif-dm">
+            💊 Medication Management
+        </h1>
+        <p class="text-[#718096] text-[0.95rem] mt-1">
+            Manage medications and view prescriptions
+        </p>
+    </div>
+
+    <!-- 🔷 Top Bar -->
+    <div class="w-full max-w-[960px] flex flex-wrap items-center gap-3 mb-6">
+
+        <!-- Search -->
+        <form th:action="@{/medications}" method="get"
+              class="flex items-center gap-2 flex-1">
+
+            <input type="text"
+                   name="keyword"
+                   th:value="${keyword}"
+                   placeholder="Search medications..."
+                   class="flex-1 px-4 py-2 border-2 border-[#e2e8f0] rounded-[10px] focus:border-[#0a6e6e] outline-none text-[0.95rem]"/>
+
+            <button type="submit"
+                    class="bg-[#0a6e6e] hover:bg-[#085a5a] text-white px-5 py-2 rounded-[10px]">
+                Search
+            </button>
+
+            <a th:href="@{/medications}"
+               class="px-4 py-2 border-2 border-[#e2e8f0] rounded-[10px] text-[#718096] hover:text-[#0a6e6e] hover:border-[#0a6e6e]">
+                ✕
+            </a>
+        </form>
+
+        <!-- Add Button -->
+        <a href="/medications/add"
+           class="bg-[#0a6e6e] hover:bg-[#085a5a] text-white px-6 py-2 rounded-[10px] shadow">
+            + Add Medication
+        </a>
+    </div>
+
+    <!-- 🔷 Result Count -->
+    <div class="w-full max-w-[960px] text-[#718096] text-[0.88rem] mb-3 pl-1">
+        Showing 
+        <span class="text-[#0a6e6e] font-semibold"
+              th:text="${totalElements}">0</span>
+        result(s)
+    </div>
+
+    <!-- 🔷 Table Card -->
+    <div class="w-full max-w-[960px] bg-white rounded-2xl shadow overflow-hidden">
+
+        <!-- Empty -->
+        <div th:if="${#lists.isEmpty(medications)}"
+             class="text-center py-10 text-[#718096]">
+            No medications found.
+        </div>
+
+        <!-- Table -->
+        <table th:unless="${#lists.isEmpty(medications)}"
+               class="w-full text-left">
+
+            <thead class="bg-[#0a6e6e] text-white">
+                <tr>
+                    <th class="py-4 px-6 text-center">#</th>
+                    <th class="py-4 px-6 text-center">Name</th>
+                    <th class="py-4 px-6 text-center">Brand</th>
+                    <th class="py-4 px-6 text-center">Description</th>
+                    <th class="py-4 px-6 text-center">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="m, iterStat : ${medications}"
+                    class="border-b hover:bg-[#f7fffe]">
+
+                    <!-- Serial -->
+                    <td class="py-3 px-6 text-center"
+                        th:text="${(currentPage * size) + iterStat.index + 1}"></td>
+
+                    <td class="py-3 px-6 text-center" th:text="${m.name}"></td>
+                    <td class="py-3 px-6 text-center" th:text="${m.brand}"></td>
+                    <td class="py-3 px-6 text-center" th:text="${m.description}"></td>
+
+                    <td class="py-3 px-6 text-center">
+                        <div class="flex justify-center gap-2">
+
+                            <!-- Edit -->
+                            <a th:href="@{'/medications/edit/' + ${m.code}}"
+                               class="px-3 py-1 bg-[#0a6e6e] text-white rounded-[7px] text-[0.85rem] hover:bg-[#085a5a]">
+                                Edit
+                            </a>
+
+                            <!-- View -->
+                            <a th:href="@{/prescriptions(medicationId=${m.code})}"
+                               class="px-3 py-1 bg-[#12b886] text-white rounded-[7px] text-[0.85rem] hover:bg-[#0f9f6e]">
+                                View
+                            </a>
+
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 🔷 Pagination -->
+    <div class="mt-8 flex justify-center items-center gap-4"
+         th:if="${totalPages > 0}">
+
+        <div class="text-[#718096] text-[0.9rem]">
+            Page <span class="text-[#0a6e6e] font-semibold"
+                        th:text="${currentPage + 1}"></span>
+            of
+            <span class="text-[#0a6e6e] font-semibold"
+                        th:text="${totalPages}"></span>
+        </div>
+
+        <div class="flex gap-2">
+
+            <!-- Prev -->
+            <a th:if="${currentPage > 0}"
+               th:href="@{/medications(page=${currentPage - 1}, keyword=${keyword})}"
+               class="px-4 py-2 bg-white border rounded-[10px] hover:border-[#0a6e6e]">
+                ← Prev
+            </a>
+
+            <!-- Next -->
+            <a th:if="${currentPage < totalPages - 1}"
+               th:href="@{/medications(page=${currentPage + 1}, keyword=${keyword})}"
+               class="px-4 py-2 bg-white border rounded-[10px] hover:border-[#0a6e6e]">
+                Next →
+            </a>
+
+        </div>
+    </div>
+
+</body>
+</html>

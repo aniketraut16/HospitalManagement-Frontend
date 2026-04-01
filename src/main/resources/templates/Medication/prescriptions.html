@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Prescriptions</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        .font-serif-dm { font-family: 'DM Serif Display', serif; }
+        body { font-family: 'DM Sans', sans-serif; background: #f0f4f8; color: #1a202c; }
+    </style>
+</head>
+
+<body class="min-h-screen py-10 flex flex-col items-center px-4">
+
+    <!-- 🔷 Breadcrumb -->
+    <div class="w-full max-w-[960px] mb-6 flex items-center text-[0.95rem] font-medium text-[#718096]">
+        <a href="/" class="hover:text-[#0a6e6e] flex items-center gap-1.5">
+            🏠 Home
+        </a>
+        <span class="mx-2 text-[#cbd5e0]">/</span>
+
+        <a th:href="@{/medications}" class="hover:text-[#0a6e6e]">
+            Medications
+        </a>
+        <span class="mx-2 text-[#cbd5e0]">/</span>
+
+        <span class="text-[#1a202c]">
+            Prescriptions
+        </span>
+    </div>
+
+    <!-- 🔷 Title -->
+    <div class="w-full max-w-[960px] mb-6 text-center">
+        <h1 class="text-[2.2rem] text-[#0a6e6e] font-serif-dm">
+            💊 Prescriptions
+        </h1>
+        <p class="text-[#718096] text-[0.95rem] mt-1">
+            For Medication: 
+            <span class="font-semibold text-[#0a6e6e]" th:text="${medicationName}"></span>
+        </p>
+    </div>
+
+    <!-- 🔷 Table Card -->
+    <div class="w-full max-w-[960px] bg-white rounded-2xl shadow overflow-hidden">
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(prescriptions)}"
+             class="text-center py-10 text-[#718096]">
+            No prescriptions found.
+        </div>
+
+        <!-- Table -->
+        <table th:unless="${#lists.isEmpty(prescriptions)}"
+               class="w-full text-left">
+
+            <thead class="bg-[#0a6e6e] text-white">
+                <tr>
+                    <th class="py-4 px-6 text-center">#</th>
+                    <th class="py-4 px-6 text-center">Physician</th>
+                    <th class="py-4 px-6 text-center">Patient</th>
+                    <th class="py-4 px-6 text-center">Dose</th>
+                    <th class="py-4 px-6 text-center">Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="p, iterStat : ${prescriptions}"
+                    class="border-b hover:bg-[#f7fffe]">
+
+                    <!-- Serial -->
+                    <td class="py-3 px-6 text-center"
+                        th:text="${(currentPage != null ? currentPage : 0) * (size != null ? size : 10) + iterStat.index + 1}">
+                    </td>
+
+                    <td class="py-3 px-6 text-center" th:text="${p.physicianName}"></td>
+                    <td class="py-3 px-6 text-center" th:text="${p.patientName}"></td>
+                    <td class="py-3 px-6 text-center" th:text="${p.dose}"></td>
+                    <td class="py-3 px-6 text-center" th:text="${p.date}"></td>
+
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 🔷 Pagination -->
+    <div class="mt-8 flex justify-center items-center gap-4"
+         th:if="${totalPages != null and totalPages > 0}">
+
+        <div class="text-[#718096] text-[0.9rem]">
+            Page 
+            <span class="text-[#0a6e6e] font-semibold"
+                  th:text="${(currentPage != null ? currentPage : 0) + 1}"></span>
+            of 
+            <span class="text-[#0a6e6e] font-semibold"
+                  th:text="${totalPages}"></span>
+        </div>
+
+        <div class="flex gap-2">
+
+            <!-- Prev -->
+            <a th:if="${currentPage != null and currentPage > 0}"
+               th:href="@{/prescriptions(medicationId=${medicationId}, page=${currentPage - 1})}"
+               class="px-4 py-2 bg-white border border-[#e2e8f0] rounded-[10px] hover:border-[#0a6e6e] hover:text-[#0a6e6e]">
+                ← Prev
+            </a>
+
+            <!-- Next -->
+            <a th:if="${currentPage != null and totalPages != null and currentPage < totalPages - 1}"
+               th:href="@{/prescriptions(medicationId=${medicationId}, page=${currentPage + 1})}"
+               class="px-4 py-2 bg-white border border-[#e2e8f0] rounded-[10px] hover:border-[#0a6e6e] hover:text-[#0a6e6e]">
+                Next →
+            </a>
+
+        </div>
+    </div>
+
+    <!-- 🔷 Back Button -->
+    <div class="mt-6">
+        <a th:href="@{/medications}"
+           class="px-6 py-2 bg-[#0a6e6e] text-white rounded-[10px] hover:bg-[#085a5a] shadow">
+            ← Back to Medications
+        </a>
+    </div>
+
+</body>
+</html>
