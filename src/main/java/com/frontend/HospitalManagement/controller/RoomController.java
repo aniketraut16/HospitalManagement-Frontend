@@ -1,7 +1,7 @@
-package com.frontend.RoomManager.controller;
+package com.frontend.HospitalManagement.controller;
 
-import com.frontend.RoomManager.dto.room.*;
-import com.frontend.RoomManager.service.RoomService;
+import com.frontend.HospitalManagement.dto.room.*;
+import com.frontend.HospitalManagement.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -58,7 +58,7 @@ public class RoomController {
     public String showUpdateRoomForm(@PathVariable("roomNumber") int roomNumber, Model model) {
         RoomDto room = roomService.getRoomByNumber(roomNumber);
         UpdateRoomDTO updateDTO = new UpdateRoomDTO();
-        updateDTO.setRoomType(com.frontend.RoomManager.dto.room.enums.RoomType.valueOf(room.getRoomType()));
+        updateDTO.setRoomType(com.frontend.HospitalManagement.dto.room.enums.RoomType.valueOf(room.getRoomType()));
         System.out.println(room.getBlock());
         if (room.getBlockFloor() != null && room.getBlockCode() != null) {
             updateDTO.setBlockFloor(room.getBlockFloor());

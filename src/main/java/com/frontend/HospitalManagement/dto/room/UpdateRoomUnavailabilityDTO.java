@@ -1,4 +1,4 @@
-package com.frontend.RoomManager.dto.room;
+package com.frontend.HospitalManagement.dto.room;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

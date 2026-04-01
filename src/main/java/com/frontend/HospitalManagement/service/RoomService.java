@@ -1,10 +1,9 @@
-package com.frontend.RoomManager.service;
+package com.frontend.HospitalManagement.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.frontend.RoomManager.dto.room.*;
+import com.frontend.HospitalManagement.dto.room.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;

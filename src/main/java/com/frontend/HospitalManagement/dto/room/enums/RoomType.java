@@ -1,4 +1,4 @@
-package com.frontend.RoomManager.dto.room.enums;
+package com.frontend.HospitalManagement.dto.room.enums;
 
 public enum RoomType {
     General,

@@ -1,6 +1,6 @@
-package com.frontend.RoomManager.dto.room;
+package com.frontend.HospitalManagement.dto.room;
 
-import com.frontend.RoomManager.dto.room.enums.RoomType;
+import com.frontend.HospitalManagement.dto.room.enums.RoomType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

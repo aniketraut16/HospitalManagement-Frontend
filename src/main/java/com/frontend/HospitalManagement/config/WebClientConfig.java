@@ -1,4 +1,4 @@
-package com.frontend.RoomManager.config;
+package com.frontend.HospitalManagement.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

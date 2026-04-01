@@ -1,4 +1,4 @@
-package com.frontend.RoomManager;
+package com.frontend.HospitalManagement;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

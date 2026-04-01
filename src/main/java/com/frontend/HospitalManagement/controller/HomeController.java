@@ -1,4 +1,4 @@
-package com.frontend.RoomManager.controller;
+package com.frontend.HospitalManagement.controller;
 
 
 import org.springframework.stereotype.Controller;
