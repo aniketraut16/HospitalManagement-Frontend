@@ -219,17 +219,17 @@
 
             <div class="form-group">
                 <label>Phone Number</label>
-                <input type="text" name="phone" th:value="${patientUpdateDto.phone}" placeholder="Enter 10-digit phone"/>
+                <input type="text" name="phone" th:value="${patientUpdateDto.phone}" pattern="^(\+\d{1,3}[- ]?)?\d{10}$" maxlength="15" title="Please enter a valid 10-digit phone number (country code like +91 is allowed)" placeholder="Enter 10-digit phone"/>
             </div>
 
             <div class="form-group">
                 <label>Insurance ID</label>
-                <input type="number" name="insuranceID" th:value="${patientUpdateDto.insuranceID}" placeholder="Enter insurance policy number"/>
+                <input type="number" name="insuranceID" th:value="${patientUpdateDto.insuranceID}" min="1" max="2147483647" placeholder="Enter insurance policy number"/>
             </div>
 
             <div class="form-group">
                 <label>PCP Physician ID</label>
-                <input type="number" name="pcpId" placeholder="Employee ID (Leave blank to keep current)"/>
+                <input type="number" name="pcpId" min="1" max="2147483647" placeholder="Employee ID (Leave blank to keep current)"/>
             </div>
 
             <button type="submit" class="btn-submit">Save Changes</button>
