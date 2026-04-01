@@ -30,7 +30,7 @@ public class RoomController {
         RoomResponseDto roomResponse = roomService.getRoomsByType(type, page);
         model.addAttribute("rooms", roomResponse.getRooms());
         model.addAttribute("page", roomResponse.getPage());
-        model.addAttribute("roomType", type + " Rooms");
+        model.addAttribute("roomType", type);
         return "room/rooms";
     }
 
@@ -133,6 +133,10 @@ public class RoomController {
         
         UpdateRoomUnavailabilityDTO dto = new UpdateRoomUnavailabilityDTO(!unavailable);
         roomService.toggleUnavailability(dto, roomNumber);
+        
+        if (roomType != null && roomType.startsWith("Search")) {
+            return "redirect:/rooms/search?roomNumber=" + roomNumber;
+        }
         
         return "redirect:/rooms/" + roomType;
     }
