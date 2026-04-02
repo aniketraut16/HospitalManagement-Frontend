@@ -11,7 +11,8 @@ public class PhysicianDTO {
     
     @NotNull(message = "Employee ID is required")
     @Min(value = 1, message = "Employee ID must be greater than 0")
-    private Integer employeeId;
+    @Max(value = 9999999999L, message = "Employee ID cannot exceed 10 digits")
+    private Long employeeId;
 
     @NotBlank(message = "Name is required")
     @Pattern(regexp = "^[A-Za-z\\s\\.]+$", message = "Name must contain only letters, spaces, and dots")

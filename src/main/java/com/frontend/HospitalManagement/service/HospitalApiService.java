@@ -49,7 +49,7 @@ public class HospitalApiService {
         return fetchPhysicianPage(url);
     }
 
-    public PhysicianDTO getPhysicianById(Integer id) {
+    public PhysicianDTO getPhysicianById(Long id) {
         String url = backendUrl + "/allPhysician/" + id;
         try {
             String response = restTemplate.getForObject(url, String.class);
@@ -75,7 +75,7 @@ public class HospitalApiService {
         restTemplate.postForEntity(url, request, String.class);
     }
 
-    public void updatePhysician(Integer id, PhysicianDTO dto) {
+    public void updatePhysician(Long id, PhysicianDTO dto) {
         String url = backendUrl + "/allPhysician/" + id;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -90,7 +90,7 @@ public class HospitalApiService {
         restTemplate.put(url, request);
     }
 
-    public void deletePhysician(Integer id) {
+    public void deletePhysician(Long id) {
         String url = backendUrl + "/allPhysician/" + id;
         restTemplate.delete(url);
     }
@@ -102,7 +102,7 @@ public class HospitalApiService {
         return fetchAffiliationPage(url);
     }
 
-    public List<AffiliationDTO> getAffiliationsByPhysician(Integer physicianId) {
+    public List<AffiliationDTO> getAffiliationsByPhysician(Long physicianId) {
         String url = backendUrl + "/affiliations/search/findByPhysician?physicianId=" + physicianId
                 + "&projection=fullAffiliation";
         try {
@@ -122,7 +122,7 @@ public class HospitalApiService {
         }
     }
 
-    public void createAffiliation(Integer physicianId, Integer departmentId, Boolean isPrimary) {
+    public void createAffiliation(Long physicianId, Integer departmentId, Boolean isPrimary) {
         String url = backendUrl + "/affiliations";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -136,7 +136,7 @@ public class HospitalApiService {
         restTemplate.postForEntity(url, request, String.class);
     }
 
-    public void deleteAffiliation(Integer physicianId, Integer departmentId) {
+    public void deleteAffiliation(Long physicianId, Integer departmentId) {
         // Find affiliation to delete
         String url = backendUrl + "/affiliations/search/findByPhysician?physicianId=" + physicianId;
         try {
@@ -226,9 +226,9 @@ public class HospitalApiService {
             List<PhysicianDTO> physicians = new ArrayList<>();
             if (embedded.isArray()) {
                 for (JsonNode node : embedded) {
-                    Integer id = null;
+                    Long id = null;
                     if (node.has("employeeId")) {
-                        id = node.get("employeeId").asInt();
+                        id = node.get("employeeId").asLong();
                     } else {
                         String selfHref = node.path("_links").path("self").path("href").asText("");
                         id = extractIdFromHref(selfHref);
@@ -268,7 +268,8 @@ public class HospitalApiService {
                         id = node.get("departmentId").asInt();
                     } else {
                         String selfHref = node.path("_links").path("self").path("href").asText("");
-                        id = extractIdFromHref(selfHref);
+                        Long extractedId = extractIdFromHref(selfHref);
+                        id = (extractedId != null) ? extractedId.intValue() : null;
                     }
                     departments.add(mapToDepartmentDTO(node, id));
                 }
@@ -321,10 +322,10 @@ public class HospitalApiService {
         }
     }
 
-    private PhysicianDTO mapToPhysicianDTO(JsonNode node, Integer fallbackId) {
-        Integer id = fallbackId;
+    private PhysicianDTO mapToPhysicianDTO(JsonNode node, Long fallbackId) {
+        Long id = fallbackId;
         if (node.has("employeeId")) {
-            id = node.get("employeeId").asInt();
+            id = node.get("employeeId").asLong();
         }
         return PhysicianDTO.builder()
                 .employeeId(id)
@@ -357,12 +358,12 @@ public class HospitalApiService {
                 .build();
     }
 
-    private Integer extractIdFromHref(String href) {
+    private Long extractIdFromHref(String href) {
         if (href == null || href.isEmpty())
             return null;
         String[] parts = href.split("/");
         try {
-            return Integer.parseInt(parts[parts.length - 1]);
+            return Long.parseLong(parts[parts.length - 1]);
         } catch (NumberFormatException e) {
             return null;
         }

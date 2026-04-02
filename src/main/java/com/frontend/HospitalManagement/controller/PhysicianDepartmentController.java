@@ -80,7 +80,7 @@ public class PhysicianDepartmentController {
     }
 
     @GetMapping("/physicians/{id}")
-    public String physicianDetail(@PathVariable Integer id, Model model) {
+    public String physicianDetail(@PathVariable Long id, Model model) {
         try {
             PhysicianDTO physician = apiService.getPhysicianById(id);
             List<AffiliationDTO> affiliations = apiService.getAffiliationsByPhysician(id);
@@ -156,7 +156,7 @@ public class PhysicianDepartmentController {
     }
 
     @GetMapping("/physicians/{id}/edit")
-    public String editPhysicianForm(@PathVariable Integer id, Model model) {
+    public String editPhysicianForm(@PathVariable Long id, Model model) {
         try {
             PhysicianDTO physician = apiService.getPhysicianById(id);
             model.addAttribute("physician", physician);
@@ -172,7 +172,7 @@ public class PhysicianDepartmentController {
     }
 
     @PostMapping("/physicians/{id}/edit")
-    public String updatePhysician(@PathVariable Integer id,
+    public String updatePhysician(@PathVariable Long id,
                                    @Valid @ModelAttribute("physician") PhysicianDTO physician,
                                    BindingResult result,
                                    Model model,
@@ -209,7 +209,7 @@ public class PhysicianDepartmentController {
     }
 
     @PostMapping("/physicians/{id}/delete")
-    public String deletePhysician(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+    public String deletePhysician(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             apiService.deletePhysician(id);
             redirectAttributes.addFlashAttribute("success", "Physician deleted successfully!");
@@ -367,7 +367,7 @@ public class PhysicianDepartmentController {
     }
 
     @PostMapping("/affiliations/new")
-    public String createAffiliation(@RequestParam Integer physicianId,
+    public String createAffiliation(@RequestParam Long physicianId,
                                     @RequestParam Integer departmentId,
                                     @RequestParam(defaultValue = "false") Boolean isPrimary,
                                     RedirectAttributes redirectAttributes) {
@@ -382,7 +382,7 @@ public class PhysicianDepartmentController {
     }
 
     @PostMapping("/affiliations/delete")
-    public String deleteAffiliation(@RequestParam Integer physicianId,
+    public String deleteAffiliation(@RequestParam Long physicianId,
                                     @RequestParam Integer departmentId,
                                     RedirectAttributes redirectAttributes) {
         try {
