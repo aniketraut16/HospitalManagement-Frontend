@@ -120,20 +120,37 @@ public class PhysicianDepartmentController {
         }
 
         try {
+            // Check SSN Duplicate
             Map<String, Object> ssnCheck = apiService.searchPhysicianBySsn(physician.getSsn());
-            List<PhysicianDTO> existing = (List<PhysicianDTO>) ssnCheck.get("physicians");
-            if (existing != null && !existing.isEmpty()) {
+            List<PhysicianDTO> existingSsn = (List<PhysicianDTO>) ssnCheck.get("physicians");
+            if (existingSsn != null && !existingSsn.isEmpty()) {
                 model.addAttribute("error", "Failed to create physician: SSN already exists.");
                 model.addAttribute("isEdit", false);
                 model.addAttribute("activePage", "physicians");
                 return "DepartmentAndPhysician/physician-form";
             }
 
+            // Check Employee ID Duplicate
+            try {
+                apiService.getPhysicianById(physician.getEmployeeId());
+                // If no exception, it exists
+                model.addAttribute("error", "Failed to create physician: Employee ID already exists.");
+                model.addAttribute("isEdit", false);
+                model.addAttribute("activePage", "physicians");
+                return "DepartmentAndPhysician/physician-form";
+            } catch (Exception e) {
+                // If it's a 404, we are good to go. 
+                // We'll proceed with creation regardless of why it failed (if it was a 404 or connection error, the creation will attempt it).
+            }
+
             apiService.createPhysician(physician);
             redirectAttributes.addFlashAttribute("success", "Physician created successfully!");
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "Failed to create physician: " + e.getMessage());
+            model.addAttribute("error", "Failed to create physician: " + e.getMessage());
+            model.addAttribute("isEdit", false);
+            model.addAttribute("activePage", "physicians");
+            return "DepartmentAndPhysician/physician-form";
         }
         return "redirect:/physicians";
     }
@@ -183,7 +200,10 @@ public class PhysicianDepartmentController {
             redirectAttributes.addFlashAttribute("success", "Physician updated successfully!");
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "Failed to update physician: " + e.getMessage());
+            model.addAttribute("error", "Failed to update physician: " + e.getMessage());
+            model.addAttribute("isEdit", true);
+            model.addAttribute("activePage", "physicians");
+            return "DepartmentAndPhysician/physician-form";
         }
         return "redirect:/physicians/" + id;
     }

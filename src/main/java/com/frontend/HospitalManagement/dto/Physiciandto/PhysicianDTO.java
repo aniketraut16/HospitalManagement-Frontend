@@ -10,7 +10,7 @@ import lombok.*;
 public class PhysicianDTO {
     
     @NotNull(message = "Employee ID is required")
-    @Min(value = 0, message = "Employee ID must be a non-negative number")
+    @Min(value = 1, message = "Employee ID must be greater than 0")
     private Integer employeeId;
 
     @NotBlank(message = "Name is required")
