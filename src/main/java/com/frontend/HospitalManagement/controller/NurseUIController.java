@@ -2,6 +2,7 @@ package com.frontend.HospitalManagement.controller;
 
 import com.frontend.HospitalManagement.dto.Nurse.NurseDTO;
 import com.frontend.HospitalManagement.dto.Nurse.NursePageResponse;
+import com.frontend.HospitalManagement.dto.Nurse.NursePosition;
 import com.frontend.HospitalManagement.service.NurseApiService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,18 +25,25 @@ public class NurseUIController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String positionFilter,
+            @RequestParam(required = false) NursePosition positionFilter,
             Model model
     ) {
 
         NursePageResponse response =
                 nurseApiService.getNurses(page, size, keyword, positionFilter);
 
-        model.addAttribute("nurses", response.getNurses());
-        model.addAttribute("totalPages", response.getTotalPages());
+        if (response != null && response.getNurses() != null) {
+            model.addAttribute("nurses", response.getNurses());
+            model.addAttribute("totalPages", response.getTotalPages());
+        } else {
+            model.addAttribute("nurses", java.util.Collections.emptyList());
+            model.addAttribute("totalPages", 0);
+        }
+
         model.addAttribute("currentPage", page);
-        model.addAttribute("keyword", keyword);
+        model.addAttribute("keyword", keyword != null ? keyword : "");
         model.addAttribute("positionFilter", positionFilter);
+        model.addAttribute("positions", NursePosition.values());
 
         return "nurse/nurses";
     }
@@ -43,9 +51,8 @@ public class NurseUIController {
 
     @GetMapping("/nurses/add")
     public String showAddForm(Model model) {
-
         model.addAttribute("nurse", new NurseDTO());
-
+        model.addAttribute("positions", NursePosition.values());
         return "nurse/add-nurse";
     }
 
@@ -55,6 +62,7 @@ public class NurseUIController {
                            Model model) {
 
         if (result.hasErrors()) {
+            model.addAttribute("positions", NursePosition.values());
             return "nurse/add-nurse";
         }
 
@@ -68,13 +76,25 @@ public class NurseUIController {
 
         NurseDTO nurse = nurseApiService.getNurseById(id);
 
+        if (nurse == null) {
+            return "redirect:/nurses";
+        }
+
         model.addAttribute("nurse", nurse);
+        model.addAttribute("positions", NursePosition.values());
 
         return "nurse/edit-nurse";
     }
 
     @PostMapping("/nurses/update")
-    public String updateNurse(@ModelAttribute NurseDTO nurse) {
+    public String updateNurse(@Valid @ModelAttribute NurseDTO nurse,
+                              BindingResult result,
+                              Model model) {
+
+        if (result.hasErrors()) {
+            model.addAttribute("positions", NursePosition.values());
+            return "nurse/edit-nurse";
+        }
 
         nurseApiService.updateNurse(nurse.getEmployeeId(), nurse);
 
@@ -84,6 +104,11 @@ public class NurseUIController {
     @GetMapping("/nurses/view/{id}")
     public String viewNurse(@PathVariable Integer id, Model model) {
         NurseDTO nurse = nurseApiService.getNurseById(id);
+
+        if (nurse == null) {
+            return "redirect:/nurses";
+        }
+
         Map<String, Object> onCall = nurseApiService.getOnCallByNurse(id);
         Map<String, Object> appointment = nurseApiService.getAppointmentByNurse(id);
         String status = nurseApiService.getNurseStatus(id);

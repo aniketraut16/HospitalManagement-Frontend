@@ -1,215 +1,305 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Nurse Management</title>
-
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f5f7fa;
-            margin: 0;
+        :root {
+            --bg: #f0f4f8;
+            --card: #ffffff;
+            --primary: #0a6e6e;
+            --primary-dark: #085a5a;
+            --accent: #12b886;
+            --text: #1a202c;
+            --muted: #718096;
+            --border: #e2e8f0;
+            --shadow: 0 4px 24px rgba(0,0,0,0.08);
+            --row-hover: #f7fffe;
         }
 
-        .container {
-            width: 90%;
-            margin: auto;
-            padding: 30px 0;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 48px 16px;
         }
+
+        .container { width: 100%; max-width: 1000px; }
+
+        /* BREADCRUMB */
+        .breadcrumb {
+            width: 100%;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--muted);
+        }
+        .breadcrumb a {
+            color: var(--muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+        .breadcrumb a:hover { color: var(--primary); }
+        .breadcrumb .sep { margin: 0 8px; color: #cbd5e0; }
+        .breadcrumb .current { color: var(--text); text-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 
         /* HEADER */
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
+        .header { text-align: center; margin-bottom: 28px; }
         .header h1 {
-            color: #1f6f6d;
-            margin-bottom: 5px;
+            font-family: 'DM Serif Display', serif;
+            font-size: 2.4rem;
+            color: var(--primary);
+            letter-spacing: -0.5px;
         }
+        .header p { color: var(--muted); margin-top: 6px; font-size: 0.95rem; font-weight: 300; }
 
-        .header p {
-            color: #6c757d;
-        }
-
-        /* TOP BAR */
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .search-box {
+        /* TOOLBAR */
+        .toolbar {
             display: flex;
             gap: 10px;
+            margin-bottom: 24px;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
-        .search-box input {
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            width: 220px;
+        .search-form {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
-        .btn {
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: none;
+        .search-form input[type="text"] {
+            flex: 1;
+            min-width: 180px;
+            padding: 11px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text);
+            background: var(--card);
+            outline: none;
+            transition: border-color 0.2s;
+            box-shadow: var(--shadow);
+        }
+        .search-form input[type="text"]:focus { border-color: var(--primary); }
+
+        .search-form select {
+            padding: 11px 14px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text);
+            background: var(--card);
+            outline: none;
             cursor: pointer;
+            transition: border-color 0.2s;
+            box-shadow: var(--shadow);
         }
+        .search-form select:focus { border-color: var(--primary); }
 
-        .btn-primary {
-            background: #1f6f6d;
+        .btn-search {
+            padding: 11px 22px;
+            background: var(--primary);
             color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
+        .btn-search:hover { background: var(--primary-dark); }
 
-        .btn-outline {
-            border: 1px solid #1f6f6d;
-            background: white;
-            color: #1f6f6d;
+        .btn-add {
+            padding: 11px 22px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: background 0.2s;
+            text-decoration: none;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
+        .btn-add:hover { background: #0fa876; }
 
-        /* CARD */
+        /* CARD + TABLE */
         .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
             overflow: hidden;
         }
 
-        /* TABLE */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        table { width: 100%; border-collapse: collapse; }
 
-        thead {
-            background: #1f6f6d;
-            color: white;
-        }
-
-        th, td {
-            padding: 14px;
+        thead { background: var(--primary); color: white; }
+        thead th {
+            padding: 16px 24px;
             text-align: left;
+            font-weight: 500;
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         tbody tr {
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
         }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: var(--row-hover); }
+        tbody td { padding: 14px 24px; font-size: 0.97rem; vertical-align: middle; }
 
-        tbody tr:hover {
-            background: #f9f9f9;
-        }
-
-        /* STATUS BADGE */
+        /* BADGES */
         .badge {
-            padding: 6px 12px;
+            display: inline-block;
+            padding: 4px 12px;
             border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
         }
+        .badge-available { background: #e6f9f3; color: #0a6e6e; border: 1px solid #b2f0e0; }
+        .badge-busy      { background: #fff5f5; color: #e53e3e; border: 1px solid #feb2b2; }
+        .badge-oncall    { background: #ebf4ff; color: #2b6cb0; border: 1px solid #bee3f8; }
+        .badge-unknown   { background: #f7fafc; color: var(--muted); border: 1px solid var(--border); }
 
-        .busy {
-            background: #ffe0e0;
-            color: #d93025;
-        }
-
-        .available {
-            background: #e0f5ec;
-            color: #1e8e5a;
+        /* POSITION BADGE */
+        .badge-position {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            background: #e6f9f3;
+            color: #0a6e6e;
+            border: 1px solid #b2f0e0;
         }
 
         /* ACTION BUTTONS */
-        .actions a {
-            margin-right: 8px;
+        .btn-view {
+            padding: 5px 14px;
+            background: white;
+            color: var(--text);
+            border: 2px solid var(--border);
+            border-radius: 7px;
+            font-size: 0.82rem;
+            font-weight: 500;
             text-decoration: none;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: border-color 0.2s, color 0.2s;
         }
+        .btn-view:hover { border-color: var(--primary); color: var(--primary); }
 
-        .view-btn {
-            border: 1px solid #ccc;
-        }
-
-        .edit-btn {
-            background: #1f6f6d;
+        .btn-edit {
+            padding: 5px 14px;
+            background: var(--primary);
             color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s;
         }
+        .btn-edit:hover { background: var(--primary-dark); }
+
+        .actions-cell { display: flex; gap: 8px; align-items: center; }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 60px 24px;
+            color: var(--muted);
+        }
+        .empty-state p { font-size: 1rem; margin-top: 8px; }
+
+        /* RESULTS COUNT */
+        .results-info {
+            font-size: 0.88rem;
+            color: var(--muted);
+            margin-bottom: 12px;
+            padding-left: 2px;
+        }
+        .results-info strong { color: var(--primary); }
 
         /* PAGINATION */
         .pagination {
-            text-align: center;
-            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-top: 28px;
+            font-size: 0.88rem;
         }
+        .pagination .page-info { color: var(--muted); }
+        .pagination .page-info strong { color: var(--text); }
 
-        .pagination a {
-            margin: 0 4px;
-            padding: 8px 12px;
-            border-radius: 6px;
+        .btn-page {
+            padding: 8px 20px;
+            background: var(--card);
+            color: var(--muted);
+            border: 2px solid var(--border);
+            border-radius: 10px;
             text-decoration: none;
-            border: 1px solid #ddd;
-            color: #333;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: border-color 0.2s, color 0.2s;
+            box-shadow: var(--shadow);
         }
-
-        .pagination a.active {
-            background: #1f6f6d;
-            color: white;
-        }
-
-        .pagination a:hover {
-            background: #eaeaea;
-        }
-        .top-bar {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-
-.search-filter {
-    display: flex;
-    gap: 10px;
-}
-
-.search-filter input,
-.search-filter select {
-    padding: 8px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-}
-
-.add-btn {
-    background: #1f6f6d;
-    color: white;
-    padding: 8px 14px;
-    border-radius: 6px;
-    text-decoration: none;
-}
-
-.pagination {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.pagination button {
-    margin: 3px;
-    padding: 6px 10px;
-    border: none;
-    background: #ddd;
-    border-radius: 5px;
-}
-
-.active-page {
-    background: #1f6f6d;
-    color: white;
-}
-
+        .btn-page:hover { border-color: var(--primary); color: var(--primary); }
     </style>
 </head>
 
 <body>
-
 <div class="container">
+
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb">
+        <a href="/">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+            Home
+        </a>
+        <span class="sep">/</span>
+        <span class="current">Nurses</span>
+    </div>
 
     <!-- HEADER -->
     <div class="header">
@@ -217,95 +307,117 @@
         <p>Browse nurses and their availability</p>
     </div>
 
-    <!-- TOP BAR -->
-    <div class="top-bar">
-
-        <form method="get" action="/nurses" class="search-filter">
-
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+        <form method="get" action="/nurses" class="search-form">
             <input type="text"
                    name="keyword"
-                   placeholder="Search nurse..."
+                   placeholder="Search by name..."
                    th:value="${keyword}" />
 
             <select name="positionFilter">
-                <option value="">All</option>
-                <option value="Staff Nurse" th:selected="${positionFilter == 'Staff Nurse'}">Staff Nurse</option>
-                <option value="Nurse" th:selected="${positionFilter == 'Nurse'}">Nurse</option>
-                <option value="Head Nurse" th:selected="${positionFilter == 'Head Nurse'}">Head Nurse</option>
+                <option value="">All Positions</option>
+                <option th:each="pos : ${positions}"
+                        th:value="${pos.name()}"
+                        th:text="${pos.displayName}"
+                        th:selected="${pos == positionFilter}">
+                </option>
             </select>
 
-            <button type="submit">Search</button>
-
+            <button type="submit" class="btn-search">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                </svg>
+                Search
+            </button>
         </form>
 
-        <a href="/nurses/add" class="add-btn">+ Add Nurse</a>
+        <a href="/nurses/add" class="btn-add">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Nurse
+        </a>
+    </div>
 
+    <!-- RESULTS INFO -->
+    <div class="results-info" th:if="${nurses != null}">
+        Showing <strong th:text="${nurses.size()}">0</strong> result(s)
     </div>
 
     <!-- TABLE CARD -->
     <div class="card">
+        <div class="empty-state" th:if="${nurses == null or nurses.isEmpty()}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="#cbd5e0" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <p>No nurses found. Try adjusting your search.</p>
+        </div>
 
-        <table>
+        <table th:unless="${nurses == null or nurses.isEmpty()}">
             <thead>
-            <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Registered</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Registered</th>
+                    <th>Availability</th>
+                    <th>Actions</th>
+                </tr>
             </thead>
-
             <tbody>
-            <tr th:each="nurse, iter : ${nurses}">
-
-                <td th:text="${currentPage * 10 + iter.index + 1}"></td>
-
-                <td th:text="${nurse.name}"></td>
-                <td th:text="${nurse.position}"></td>
-                <td th:text="${nurse.registered ? 'Yes' : 'No'}"></td>
-
-            </tr>
-            <td>
-                    <span th:if="${nurse != null}"
-                          th:text="${nurse.availability}">N/A</span>
-                                <span th:if="${nurse == null}">N/A</span>
-            </td>>
-
-                <td class="actions">
-                    <a th:href="@{/nurses/view/{id}(id=${nurse.employeeId})}" class="view-btn">View</a>
-                    <a th:href="@{/nurses/edit/{id}(id=${nurse.employeeId})}" class="edit-btn">Edit</a>
-                </td>
-            </tr>
+                <tr th:each="nurse, iter : ${nurses}">
+                    <td th:text="${currentPage * 10 + iter.index + 1}" style="color: var(--muted); font-size: 0.9rem;"></td>
+                    <td style="font-weight: 500; color: var(--primary);" th:text="${nurse.name}"></td>
+                    <td>
+                        <span class="badge-position" th:text="${nurse.position != null ? nurse.position.displayName : 'N/A'}"></span>
+                    </td>
+                    <td th:text="${nurse.registered ? 'Yes' : 'No'}"></td>
+                    <td>
+                        <span th:with="av=${nurse.availability != null ? nurse.availability : 'UNKNOWN'}"
+                              th:class="${#strings.contains(av,'BUSY')} ? 'badge badge-busy' :
+                                         (${#strings.contains(av,'ON CALL')} ? 'badge badge-oncall' :
+                                         (${#strings.contains(av,'AVAILABLE')} ? 'badge badge-available' : 'badge badge-unknown'))"
+                              th:text="${av}">
+                        </span>
+                    </td>
+                    <td>
+                        <div class="actions-cell">
+                            <a th:href="@{/nurses/view/{id}(id=${nurse.employeeId})}" class="btn-view">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                                View
+                            </a>
+                            <a th:href="@{/nurses/edit/{id}(id=${nurse.employeeId})}" class="btn-edit">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                </svg>
+                                Edit
+                            </a>
+                        </div>
+                    </td>
+                </tr>
             </tbody>
         </table>
-
     </div>
 
     <!-- PAGINATION -->
-    <div class="pagination">
+    <div class="pagination" th:if="${totalPages > 1}">
+        <a th:if="${currentPage > 0}"
+           th:href="@{/nurses(page=${currentPage - 1}, keyword=${keyword}, positionFilter=${positionFilter})}"
+           class="btn-page">&larr; Prev</a>
 
-        <button th:if="${currentPage > 0}"
-                th:onclick="'window.location.href=\'/nurses?page=' + ${currentPage - 1} + '&keyword=' + ${keyword} + '&positionFilter=' + ${positionFilter} + '\''">
-            Prev
-        </button>
+        <span class="page-info">
+            Page <strong th:text="${currentPage + 1}">1</strong> of <strong th:text="${totalPages}">1</strong>
+        </span>
 
-        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-        <button th:text="${i + 1}"
-                th:classappend="${i == currentPage} ? 'active-page' : ''"
-                th:onclick="'window.location.href=\'/nurses?page=' + ${i} + '&keyword=' + ${keyword} + '&positionFilter=' + ${positionFilter} + '\''">
-        </button>
-    </span>
-
-        <button th:if="${currentPage < totalPages - 1}"
-                th:onclick="'window.location.href=\'/nurses?page=' + ${currentPage + 1} + '&keyword=' + ${keyword} + '&positionFilter=' + ${positionFilter} + '\''">
-            Next
-        </button>
-
+        <a th:if="${currentPage < totalPages - 1}"
+           th:href="@{/nurses(page=${currentPage + 1}, keyword=${keyword}, positionFilter=${positionFilter})}"
+           class="btn-page">Next &rarr;</a>
     </div>
 
 </div>
-
 </body>
 </html>

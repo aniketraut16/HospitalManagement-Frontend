@@ -4,10 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.frontend.HospitalManagement.dto.Nurse.NurseDTO;
 import com.frontend.HospitalManagement.dto.Nurse.NursePageResponse;
+import com.frontend.HospitalManagement.dto.Nurse.NursePosition;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -25,9 +24,9 @@ public class NurseApiService {
     public NurseApiService(WebClient webClient) {
         this.webClient = webClient;
     }
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // 🔥 COMMON METHOD (reuse like your RoomService)
     public String call(String url, HttpMethod method, Object body) {
 
         WebClient.RequestBodySpec request = webClient
@@ -48,7 +47,7 @@ public class NurseApiService {
     }
 
 
-    public NursePageResponse getNurses(int page, int size, String keyword, String positionFilter) {
+    public NursePageResponse getNurses(int page, int size, String keyword, NursePosition positionFilter) {
 
         String json = call("/nurse?projection=nurseView&page=0&size=1000", HttpMethod.GET, null);
 
@@ -73,11 +72,9 @@ public class NurseApiService {
 
                 NurseDTO dto = new NurseDTO();
 
-
                 JsonNode linkNode = node.path("_links").path("self").path("href");
                 if (!linkNode.isMissingNode()) {
                     String href = linkNode.asText();
-
                     if (href != null && href.contains("/")) {
                         try {
                             Integer id = Integer.parseInt(href.substring(href.lastIndexOf("/") + 1));
@@ -88,12 +85,14 @@ public class NurseApiService {
                     }
                 }
 
-
                 if (dto.getEmployeeId() == null) continue;
 
-
                 dto.setName(node.path("name").asText("N/A"));
-                dto.setPosition(node.path("position").asText("N/A"));
+
+                String positionText = node.path("position").asText("");
+                NursePosition position = NursePosition.fromDisplayName(positionText);
+                dto.setPosition(position);
+
                 dto.setRegistered(node.path("registered").asBoolean(false));
                 dto.setAvailability(node.path("availability").asText("UNKNOWN"));
 
@@ -104,28 +103,21 @@ public class NurseApiService {
             throw new RuntimeException("Error parsing nurse data", e);
         }
 
-
         if (keyword != null && !keyword.isBlank()) {
             String lower = keyword.toLowerCase();
-
             allNurses = allNurses.stream()
                     .filter(n ->
                             (n.getName() != null && n.getName().toLowerCase().contains(lower)) ||
-                                    (n.getPosition() != null && n.getPosition().toLowerCase().contains(lower))
+                            (n.getPosition() != null && n.getPosition().getDisplayName().toLowerCase().contains(lower))
                     )
                     .toList();
         }
 
-
-        if (positionFilter != null && !positionFilter.isBlank()) {
+        if (positionFilter != null) {
             allNurses = allNurses.stream()
-                    .filter(n ->
-                            n.getPosition() != null &&
-                                    n.getPosition().equalsIgnoreCase(positionFilter)
-                    )
+                    .filter(n -> positionFilter.equals(n.getPosition()))
                     .toList();
         }
-
 
         int totalElements = allNurses.size();
         int totalPages = (int) Math.ceil((double) totalElements / size);
@@ -148,17 +140,11 @@ public class NurseApiService {
     public void addNurse(NurseDTO nurse) {
 
         Map<String, Object> request = new HashMap<>();
-
         request.put("employeeId", nurse.getEmployeeId());
         request.put("name", nurse.getName());
-        request.put("position", nurse.getPosition());
+        request.put("position", nurse.getPosition() != null ? nurse.getPosition().getDisplayName() : null);
         request.put("registered", nurse.isRegistered());
-        request.put("ssn", nurse.getSsn()); // ✅ USER INPUT
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
+        request.put("ssn", nurse.getSsn());
 
         webClient.post()
                 .uri("/nurse")
@@ -171,9 +157,8 @@ public class NurseApiService {
     public void updateNurse(Integer id, NurseDTO nurse) {
 
         Map<String, Object> request = new HashMap<>();
-
         request.put("name", nurse.getName());
-        request.put("position", nurse.getPosition());
+        request.put("position", nurse.getPosition() != null ? nurse.getPosition().getDisplayName() : null);
         request.put("registered", nurse.isRegistered());
         request.put("ssn", nurse.getSsn());
 
@@ -184,6 +169,7 @@ public class NurseApiService {
                 .bodyToMono(String.class)
                 .block();
     }
+
     public NurseDTO getNurseById(Integer id) {
 
         Map<String, Object> response = webClient.get()
@@ -193,14 +179,24 @@ public class NurseApiService {
                 .block();
 
         NurseDTO dto = new NurseDTO();
-
         dto.setEmployeeId(id);
         dto.setName((String) response.get("name"));
-        dto.setPosition((String) response.get("position"));
+
+        String positionText = (String) response.get("position");
+        dto.setPosition(NursePosition.fromDisplayName(positionText));
+
         dto.setRegistered((Boolean) response.get("registered"));
+
+        Object ssnRaw = response.get("ssn");
+        if (ssnRaw instanceof Integer) {
+            dto.setSsn((Integer) ssnRaw);
+        } else if (ssnRaw instanceof Number) {
+            dto.setSsn(((Number) ssnRaw).intValue());
+        }
 
         return dto;
     }
+
     public Map<String, Object> getAppointmentByNurse(Integer nurseId) {
 
         String uri = "/appointments/search/byNurse?nurse=http://localhost:9090/nurse/" + nurseId + "&projection=appointmentView";
@@ -212,15 +208,12 @@ public class NurseApiService {
                 .block();
 
         Map<String, Object> embedded = (Map<String, Object>) response.get("_embedded");
-
         if (embedded == null || embedded.get("appointments") == null) return null;
 
-        List<Map<String, Object>> list =
-                (List<Map<String, Object>>) embedded.get("appointments");
-
+        List<Map<String, Object>> list = (List<Map<String, Object>>) embedded.get("appointments");
         if (list.isEmpty()) return null;
 
-        return list.get(0); // first appointment
+        return list.get(0);
     }
 
     public Map<String, Object> getOnCallByNurse(Integer nurseId) {
@@ -236,28 +229,20 @@ public class NurseApiService {
         if (response == null) return null;
         Map<String, Object> embedded = (Map<String, Object>) response.get("_embedded");
         if (embedded == null) return null;
-        List<Map<String, Object>> list =
-                (List<Map<String, Object>>) embedded.get("onCalls");
+        List<Map<String, Object>> list = (List<Map<String, Object>>) embedded.get("onCalls");
         if (list == null || list.isEmpty()) return null;
         return list.get(0);
     }
-    public String getNurseStatus(Integer nurseId) {
-        // check appointment
-        Map<String, Object> appointment = getAppointmentByNurse(nurseId);
 
+    public String getNurseStatus(Integer nurseId) {
+        Map<String, Object> appointment = getAppointmentByNurse(nurseId);
         if (appointment != null) {
             return "BUSY";
         }
-        // check onCall
         Map<String, Object> onCall = getOnCallByNurse(nurseId);
-
         if (onCall != null) {
             return "ON CALL";
         }
-
         return "AVAILABLE";
     }
-
-
-
 }
