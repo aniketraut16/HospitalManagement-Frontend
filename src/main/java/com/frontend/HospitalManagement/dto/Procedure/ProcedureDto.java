@@ -15,7 +15,6 @@ public class ProcedureDto {
     @JsonProperty("_links")
     @JsonIgnore
     private Map<String, Object> links;
-
     public Integer getCode() { return code; }
     public void setCode(Integer code) { this.code = code; }
 

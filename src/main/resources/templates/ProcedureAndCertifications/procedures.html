@@ -30,6 +30,40 @@
         }
 
         .container { width: 100%; max-width: 960px; }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 28px;
+            font-size: 0.83rem;
+            flex-wrap: wrap;
+            background: var(--card);
+            padding: 10px 16px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s;
+        }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .sep {
+            color: var(--border);
+            font-size: 1rem;
+            user-select: none;
+        }
+        .breadcrumb .crumb-active {
+            color: var(--muted);
+            font-weight: 500;
+        }
+
         .header { text-align: center; margin-bottom: 28px; }
         .header h1 { font-family: 'DM Serif Display', serif; font-size: 2.4rem; color: var(--primary); letter-spacing: -0.5px; }
         .header p { color: var(--muted); margin-top: 6px; font-size: 0.95rem; font-weight: 300; }
@@ -44,10 +78,7 @@
         .search-wrapper button { padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 500; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow); }
         .search-wrapper button:hover { background: #085a5a; transform: translateY(-1px); }
 
-        .back-nav { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 15px; color: var(--primary); text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: transform 0.2s; }
-        .back-nav:hover { transform: translateX(-4px); }
-
-        .results-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; padding: 0 4px; }
+        .results-header { display: flex; justify-content: flex-end; align-items: flex-end; margin-bottom: 12px; padding: 0 4px; }
         .results-info { font-size: 0.88rem; color: var(--muted); }
         .results-info span { color: var(--primary); font-weight: 600; }
 
@@ -150,9 +181,9 @@
     </form>
 
     <div class="results-header" th:if="${!search.isBlank()}">
-        <a th:href="@{/procedures(size=${size})}" class="back-nav">← Back to Full List</a>
         <div class="results-info">
             Found <span th:text="${totalElements}"></span> results for "<span th:text="${search}"></span>"
+            — <a th:href="@{/procedures(size=${size})}" style="color: var(--primary); font-weight: 600;">Clear Search</a>
         </div>
     </div>
 

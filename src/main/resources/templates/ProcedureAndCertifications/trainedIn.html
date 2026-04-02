@@ -11,7 +11,44 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'DM Sans', sans-serif; background: var(--bg); padding: 40px 20px; color: #1a202c; }
         .container { max-width: 1100px; margin: 0 auto; }
-        .back-btn { display: inline-flex; align-items: center; margin-bottom: 24px; color: var(--primary); text-decoration: none; font-weight: 500; }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 28px;
+            font-size: 0.83rem;
+            flex-wrap: wrap;
+            background: var(--card);
+            padding: 10px 16px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s;
+        }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .sep {
+            color: var(--border);
+            font-size: 1rem;
+            user-select: none;
+        }
+        .breadcrumb .crumb-active {
+            color: var(--muted);
+            font-weight: 500;
+            max-width: 220px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .header { margin-bottom: 32px; border-bottom: 2px solid var(--border); padding-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
         .header h1 { font-family: 'DM Serif Display', serif; color: var(--primary); font-size: 2.4rem; }
         .card { background: var(--card); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
