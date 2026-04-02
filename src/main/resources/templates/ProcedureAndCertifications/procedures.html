@@ -31,38 +31,26 @@
 
         .container { width: 100%; max-width: 960px; }
 
-        /* Breadcrumb */
         .breadcrumb {
+            width: 100%;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--muted);
+        }
+        .breadcrumb a {
+            color: var(--muted);
+            text-decoration: none;
             display: flex;
             align-items: center;
             gap: 6px;
-            margin-bottom: 28px;
-            font-size: 0.83rem;
-            flex-wrap: wrap;
-            background: var(--card);
-            padding: 10px 16px;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-        }
-        .breadcrumb a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 4px;
             transition: color 0.2s;
         }
-        .breadcrumb a:hover { color: var(--accent); }
-        .breadcrumb .sep {
-            color: var(--border);
-            font-size: 1rem;
-            user-select: none;
-        }
-        .breadcrumb .crumb-active {
-            color: var(--muted);
-            font-weight: 500;
-        }
+        .breadcrumb a:hover { color: var(--primary); }
+        .breadcrumb span { margin: 0 8px; color: #cbd5e0; }
+        .breadcrumb .current { color: var(--text); margin: 0; }
 
         .header { text-align: center; margin-bottom: 28px; }
         .header h1 { font-family: 'DM Serif Display', serif; font-size: 2.4rem; color: var(--primary); letter-spacing: -0.5px; }
@@ -114,48 +102,17 @@
         .form-group label { font-size: 0.75rem; font-weight: 500; color: var(--muted); text-transform: uppercase; }
         .form-group input { padding: 9px 13px; border: 2px solid var(--border); border-radius: 8px; outline: none; }
         .form-group input:focus { border-color: var(--primary); }
+        .form-group .field-hint { font-size: 0.72rem; color: var(--muted); margin-top: 3px; }
         .btn-add { padding: 10px 24px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; }
-
-        /* Breadcrumb Styles */
-        .breadcrumb {
-            width: 100%;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: var(--muted);
-        }
-        .breadcrumb a {
-            color: var(--muted);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: color 0.2s;
-        }
-        .breadcrumb a:hover {
-            color: var(--primary);
-        }
-        .breadcrumb span {
-            margin: 0 8px;
-            color: #cbd5e0;
-        }
-        .breadcrumb .current {
-            color: var(--text);
-            margin: 0;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
     </style>
 </head>
 <body>
 <div class="container">
 
-    <!-- Breadcrumb -->
     <div class="breadcrumb">
         <a href="/">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
             Home
         </a>
@@ -169,8 +126,8 @@
     </div>
 
     <div th:if="${message != null and !message.isBlank()}"
-         th:class="${message.contains('Failed') or message.contains('blank') ? 'alert alert-error' : 'alert alert-success'}">
-        <span th:text="${message.contains('Failed') or message.contains('blank') ? '⚠️' : '✅'}"></span>
+         th:class="${message.contains('Failed') or message.contains('blank') or message.contains('invalid') or message.contains('Code') ? 'alert alert-error' : 'alert alert-success'}">
+        <span th:text="${message.contains('Failed') or message.contains('blank') or message.contains('invalid') or message.contains('Code') ? '⚠️' : '✅'}"></span>
         <span th:text="${message}"></span>
     </div>
 
@@ -248,11 +205,15 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Procedure Code</label>
-                        <input type="number" name="code" placeholder="e.g. 101" required />
+                        <input type="number" name="code" id="addCode"
+                               placeholder="e.g. 101"
+                               required min="1" max="2147483647" />
+                        <span class="field-hint">Max value: 2,147,483,647</span>
                     </div>
                     <div class="form-group">
                         <label>Procedure Name</label>
-                        <input type="text" name="name" id="addName" placeholder="e.g. CT Scan" required
+                        <input type="text" name="name" id="addName"
+                               placeholder="e.g. CT Scan" required
                                pattern=".*\S+.*" title="Name cannot be empty or just spaces" />
                     </div>
                     <div class="form-group">
@@ -282,6 +243,14 @@
             alert("Procedure name cannot be blank.");
             return false;
         }
+
+        const codeVal = document.getElementById('addCode').value.trim();
+        const codeNum = Number(codeVal);
+        if (!codeVal || !Number.isInteger(codeNum) || codeNum < 1 || codeNum > 2147483647) {
+            alert("Procedure Code must be a whole number between 1 and 2,147,483,647.\n\nThe value you entered is too large or invalid.");
+            return false;
+        }
+
         return true;
     }
 </script>

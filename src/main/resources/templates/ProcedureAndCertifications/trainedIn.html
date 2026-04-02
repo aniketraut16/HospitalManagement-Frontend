@@ -11,44 +11,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'DM Sans', sans-serif; background: var(--bg); padding: 40px 20px; color: #1a202c; }
         .container { max-width: 1100px; margin: 0 auto; }
-
-        /* Breadcrumb */
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 28px;
-            font-size: 0.83rem;
-            flex-wrap: wrap;
-            background: var(--card);
-            padding: 10px 16px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-        .breadcrumb a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            transition: color 0.2s;
-        }
-        .breadcrumb a:hover { color: var(--accent); }
-        .breadcrumb .sep {
-            color: var(--border);
-            font-size: 1rem;
-            user-select: none;
-        }
-        .breadcrumb .crumb-active {
-            color: var(--muted);
-            font-weight: 500;
-            max-width: 220px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
+        .back-btn { display: inline-flex; align-items: center; margin-bottom: 24px; color: var(--primary); text-decoration: none; font-weight: 500; }
         .header { margin-bottom: 32px; border-bottom: 2px solid var(--border); padding-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
         .header h1 { font-family: 'DM Serif Display', serif; color: var(--primary); font-size: 2.4rem; }
         .card { background: var(--card); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
@@ -77,59 +40,17 @@
         .alert-success { background: #e6f9f3; color: #0a6e6e; border: 1px solid #12b886; }
         .alert-error { background: #fff5f5; color: var(--error); border: 1px solid #fc8181; }
         .error-msg { color: var(--error); font-size: 0.82rem; margin-top: 6px; display: none; }
-
-        /* Breadcrumb Styles */
-        .breadcrumb {
-            width: 100%;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: var(--muted);
-        }
-        .breadcrumb a {
-            color: var(--muted);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: color 0.2s;
-        }
-        .breadcrumb a:hover {
-            color: var(--primary);
-        }
-        .breadcrumb span {
-            margin: 0 8px;
-            color: #cbd5e0;
-        }
-        .breadcrumb .current {
-            color: #1a202c;
-            margin: 0;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
+        .field-hint { font-size: 0.72rem; color: var(--muted); margin-top: 3px; display: block; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    
-    <!-- Breadcrumb -->
-    <div class="breadcrumb">
-        <a href="/">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            Home
-        </a>
-        <span>/</span>
-        <a href="/procedures">Procedures</a>
-        <span>/</span>
-        <span class="current">Training Records</span>
-    </div>
+    <a th:href="@{/procedures}" class="back-btn">← Back to Procedures</a>
+
     <div th:if="${message != null and !message.isBlank()}"
-         th:class="${message.contains('Error') or message.contains('not found') or message.contains('Failed') or message.contains('duplicate') ? 'alert alert-error' : 'alert alert-success'}">
-        <span th:text="${message.contains('Error') or message.contains('not found') or message.contains('Failed') or message.contains('duplicate') ? '⚠️' : '✅'}"></span>
+         th:class="${message.contains('Error') or message.contains('not found') or message.contains('Failed') or message.contains('duplicate') or message.contains('Invalid') ? 'alert alert-error' : 'alert alert-success'}">
+        <span th:text="${message.contains('Error') or message.contains('not found') or message.contains('Failed') or message.contains('duplicate') or message.contains('Invalid') ? '⚠️' : '✅'}"></span>
         <span th:text="${message}"></span>
     </div>
 
@@ -216,7 +137,9 @@
 
             <div class="form-group">
                 <label>Physician ID</label>
-                <input type="number" name="physicianId" id="addPhysicianId" placeholder="e.g. 1001" min="1" required />
+                <input type="number" name="physicianId" id="addPhysicianId"
+                       placeholder="e.g. 1001" min="1" max="2147483647" required />
+                <span class="field-hint">Max value: 2,147,483,647</span>
                 <div class="error-msg" id="physicianError"></div>
             </div>
             <div class="form-group">
@@ -284,9 +207,10 @@
         let valid = true;
 
         const physId = document.getElementById('addPhysicianId').value.trim();
+        const physNum = Number(physId);
         const physErr = document.getElementById('physicianError');
-        if (!physId || parseInt(physId) <= 0) {
-            physErr.innerText = 'Please enter a valid Physician ID.';
+        if (!physId || !Number.isInteger(physNum) || physNum < 1 || physNum > 2147483647) {
+            physErr.innerText = 'Physician ID must be a whole number between 1 and 2,147,483,647.';
             physErr.style.display = 'block';
             valid = false;
         } else {
