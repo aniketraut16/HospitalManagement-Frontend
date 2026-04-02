@@ -130,28 +130,39 @@ public class MedicationService {
         return dto;
     }
 
-    public void createMedication(MedicationDTO medication) {
+    public String createMedication(MedicationDTO medication) {
+        try {
+            String url = baseUrl + "/allMedications";
 
-        String url = baseUrl + "/allMedications";
+            Map<String, Object> body = new HashMap<>();
+            body.put("code", medication.getCode());
+            body.put("name", medication.getName());
+            body.put("brand", medication.getBrand());
+            body.put("description", medication.getDescription());
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("name", medication.getName());
-        body.put("brand", medication.getBrand());
-        body.put("description", medication.getDescription());
+            restTemplate.postForObject(url, body, Object.class);
+            return null;
 
-        restTemplate.postForObject(url, body, Object.class);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
-    public void updateMedication(MedicationDTO medication) {
+    public String updateMedication(MedicationDTO medication) {
+        try {
+            String url = baseUrl + "/allMedications/" + medication.getCode();
 
-        String url = baseUrl + "/allMedications/" + medication.getCode();
+            Map<String, Object> body = new HashMap<>();
+            body.put("name", medication.getName());
+            body.put("brand", medication.getBrand());
+            body.put("description", medication.getDescription());
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("name", medication.getName());
-        body.put("brand", medication.getBrand());
-        body.put("description", medication.getDescription());
+            restTemplate.put(url, body);
+            return null;
 
-        restTemplate.put(url, body);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
 

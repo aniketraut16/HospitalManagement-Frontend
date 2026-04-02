@@ -68,12 +68,24 @@ public class MedicationController {
     }
 
     @PostMapping("/medications/save")
-    public String saveMedication(@ModelAttribute MedicationDTO dto) {
+    public String saveMedication(
+            @ModelAttribute MedicationDTO dto,
+            Model model
+    ) {
+
+        String error;
 
         if (dto.getCode() == null) {
-            service.createMedication(dto); // POST
+            error = service.createMedication(dto);
         } else {
-            service.updateMedication(dto); // PUT/PATCH
+            error = service.updateMedication(dto);
+        }
+
+        if (error != null) {
+            model.addAttribute("errorMessage", "Invalid input or duplicate code");
+            model.addAttribute("medication", dto);
+            model.addAttribute("isEdit", dto.getCode() != null);
+            return "Medication/medication-form";
         }
 
         return "redirect:/medications";
