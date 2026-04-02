@@ -15,10 +15,12 @@ public class PhysicianDTO {
     private Long employeeId;
 
     @NotBlank(message = "Name is required")
+    @Size(min = 2, max = 30, message = "Name must be between 2 and 30 characters")
     @Pattern(regexp = "^[A-Za-z\\s\\.]+$", message = "Name must contain only letters, spaces, and dots")
     private String name;
 
     @NotBlank(message = "Position is required")
+    @Size(min = 2, max = 30, message = "Position must be between 2 and 30 characters")
     @Pattern(regexp = "^[A-Za-z\\s\\-\\,\\/]+$", message = "Position contains invalid characters")
     private String position;
 
