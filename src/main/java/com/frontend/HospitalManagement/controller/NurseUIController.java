@@ -45,7 +45,7 @@ public class NurseUIController {
         model.addAttribute("positionFilter", positionFilter);
         model.addAttribute("positions", NursePosition.values());
 
-        return "nurse/nurses";
+        return "Nurse/nurses";
     }
 
 
@@ -53,7 +53,7 @@ public class NurseUIController {
     public String showAddForm(Model model) {
         model.addAttribute("nurse", new NurseDTO());
         model.addAttribute("positions", NursePosition.values());
-        return "nurse/add-nurse";
+        return "Nurse/add-nurse";
     }
 
     @PostMapping("/nurses/add")
@@ -63,7 +63,7 @@ public class NurseUIController {
 
         if (result.hasErrors()) {
             model.addAttribute("positions", NursePosition.values());
-            return "nurse/add-nurse";
+            return "Nurse/add-nurse";
         }
 
         nurseApiService.addNurse(nurse);
@@ -83,7 +83,7 @@ public class NurseUIController {
         model.addAttribute("nurse", nurse);
         model.addAttribute("positions", NursePosition.values());
 
-        return "nurse/edit-nurse";
+        return "Nurse/edit-nurse";
     }
 
     @PostMapping("/nurses/update")
@@ -93,7 +93,7 @@ public class NurseUIController {
 
         if (result.hasErrors()) {
             model.addAttribute("positions", NursePosition.values());
-            return "nurse/edit-nurse";
+            return "Nurse/edit-nurse";
         }
 
         nurseApiService.updateNurse(nurse.getEmployeeId(), nurse);
@@ -118,6 +118,6 @@ public class NurseUIController {
         model.addAttribute("appointment", appointment);
         model.addAttribute("status", status);
 
-        return "nurse/nurse-details";
+        return "Nurse/nurse-details";
     }
 }
