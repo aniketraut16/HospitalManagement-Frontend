@@ -6,6 +6,8 @@ import com.frontend.HospitalManagement.service.HospitalApiService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -38,7 +40,7 @@ public class PhysicianDepartmentController {
                     result = apiService.searchPhysiciansByPosition(search.trim(), page, size);
                 } else if ("ssn".equalsIgnoreCase(searchType)) {
                     try {
-                        int ssn = Integer.parseInt(search.trim());
+                        Long ssn = Long.parseLong(search.trim());
                         result = apiService.searchPhysicianBySsn(ssn);
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
@@ -107,26 +109,27 @@ public class PhysicianDepartmentController {
     }
 
     @PostMapping("/physicians/new")
-    public String createPhysician(@RequestParam Integer employeeId,
-                                   @RequestParam String name,
-                                   @RequestParam String position,
-                                   @RequestParam Integer ssn,
+    public String createPhysician(@Valid @ModelAttribute("physician") PhysicianDTO physician,
+                                   BindingResult result,
+                                   Model model,
                                    RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            model.addAttribute("isEdit", false);
+            model.addAttribute("activePage", "physicians");
+            return "DepartmentAndPhysician/physician-form";
+        }
+
         try {
-            Map<String, Object> ssnCheck = apiService.searchPhysicianBySsn(ssn);
+            Map<String, Object> ssnCheck = apiService.searchPhysicianBySsn(physician.getSsn());
             List<PhysicianDTO> existing = (List<PhysicianDTO>) ssnCheck.get("physicians");
             if (existing != null && !existing.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "Failed to create physician: SSN already exists.");
-                return "redirect:/physicians/new";
+                model.addAttribute("error", "Failed to create physician: SSN already exists.");
+                model.addAttribute("isEdit", false);
+                model.addAttribute("activePage", "physicians");
+                return "DepartmentAndPhysician/physician-form";
             }
 
-            PhysicianDTO dto = PhysicianDTO.builder()
-                    .employeeId(employeeId)
-                    .name(name)
-                    .position(position)
-                    .ssn(ssn)
-                    .build();
-            apiService.createPhysician(dto);
+            apiService.createPhysician(physician);
             redirectAttributes.addFlashAttribute("success", "Physician created successfully!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -153,28 +156,30 @@ public class PhysicianDepartmentController {
 
     @PostMapping("/physicians/{id}/edit")
     public String updatePhysician(@PathVariable Integer id,
-                                   @RequestParam String name,
-                                   @RequestParam String position,
-                                   @RequestParam Integer ssn,
+                                   @Valid @ModelAttribute("physician") PhysicianDTO physician,
+                                   BindingResult result,
+                                   Model model,
                                    RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            model.addAttribute("isEdit", true);
+            model.addAttribute("activePage", "physicians");
+            return "DepartmentAndPhysician/physician-form";
+        }
+
         try {
-            Map<String, Object> ssnCheck = apiService.searchPhysicianBySsn(ssn);
+            Map<String, Object> ssnCheck = apiService.searchPhysicianBySsn(physician.getSsn());
             List<PhysicianDTO> existing = (List<PhysicianDTO>) ssnCheck.get("physicians");
             if (existing != null && !existing.isEmpty()) {
                 PhysicianDTO existingPhysician = existing.get(0);
                 if (!existingPhysician.getEmployeeId().equals(id)) {
-                    redirectAttributes.addFlashAttribute("error", "Failed to update physician: SSN already exists.");
-                    return "redirect:/physicians/" + id + "/edit";
+                    model.addAttribute("error", "Failed to update physician: SSN already exists.");
+                    model.addAttribute("isEdit", true);
+                    model.addAttribute("activePage", "physicians");
+                    return "DepartmentAndPhysician/physician-form";
                 }
             }
 
-            PhysicianDTO dto = PhysicianDTO.builder()
-                    .employeeId(id)
-                    .name(name)
-                    .position(position)
-                    .ssn(ssn)
-                    .build();
-            apiService.updatePhysician(id, dto);
+            apiService.updatePhysician(id, physician);
             redirectAttributes.addFlashAttribute("success", "Physician updated successfully!");
         } catch (Exception e) {
             e.printStackTrace();

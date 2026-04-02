@@ -44,7 +44,7 @@ public class HospitalApiService {
         return fetchPhysicianPage(url);
     }
 
-    public Map<String, Object> searchPhysicianBySsn(int ssn) {
+    public Map<String, Object> searchPhysicianBySsn(Long ssn) {
         String url = backendUrl + "/allPhysician/search/findBySsnContaining?ssn=" + ssn + "&page=0&size=10";
         return fetchPhysicianPage(url);
     }
@@ -330,7 +330,7 @@ public class HospitalApiService {
                 .employeeId(id)
                 .name(node.path("name").asText(""))
                 .position(node.path("position").asText(""))
-                .ssn(node.has("ssn") ? node.get("ssn").asInt() : null)
+                .ssn(node.has("ssn") ? node.get("ssn").asLong() : null)
                 .build();
     }
 

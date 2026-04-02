@@ -62,7 +62,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
                                     <i class="fa-solid fa-id-card"></i>
                                 </span>
-                                <input type="number" id="employeeId" th:field="*{employeeId}" required
+                                <input type="number" id="employeeId" th:field="*{employeeId}" required min="0"
                                        class="input-field !pl-12"
                                        th:readonly="${isEdit}"
                                        th:classappend="${isEdit ? 'opacity-70 cursor-not-allowed bg-slate-50 border-slate-200' : ''}"
@@ -80,6 +80,7 @@
                                     <i class="fa-solid fa-user"></i>
                                 </span>
                                 <input type="text" id="name" th:field="*{name}" required
+                                       pattern="^[A-Za-z\s\.]+$" title="Please enter a valid name (letters, spaces, and dots only)"
                                        class="input-field !pl-12"
                                        placeholder="e.g. Dr. Jane Williams">
                             </div>
@@ -94,6 +95,7 @@
                                     <i class="fa-solid fa-stethoscope"></i>
                                 </span>
                                 <input type="text" id="position" th:field="*{position}" required
+                                       pattern="^[A-Za-z\s\-\,\/]+$" title="Please enter a valid position (letters, spaces, and basic punctuation only)"
                                        class="input-field !pl-12"
                                        placeholder="e.g. Attending Physician, Surgeon">
                             </div>
@@ -107,9 +109,9 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
                                     <i class="fa-solid fa-fingerprint"></i>
                                 </span>
-                                <input type="number" id="ssn" th:field="*{ssn}" required
+                                <input type="number" id="ssn" th:field="*{ssn}" required max="999999999"
                                        class="input-field !pl-12 font-mono tracking-wider"
-                                       placeholder="9 digits">
+                                       placeholder="Max 9 digits">
                             </div>
                             <p th:if="${#fields.hasErrors('ssn')}" th:errors="*{ssn}" class="text-red-500 text-xs mt-1 font-medium"></p>
                         </div>
