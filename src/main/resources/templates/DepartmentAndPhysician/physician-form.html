@@ -79,7 +79,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
                                     <i class="fa-solid fa-user"></i>
                                 </span>
-                                <input type="text" id="name" th:field="*{name}" required
+                                <input type="text" id="name" th:field="*{name}" required minlength="2" maxlength="30"
                                        pattern="^[A-Za-z\s\.]+$" title="Please enter a valid name (letters, spaces, and dots only)"
                                        class="input-field !pl-12"
                                        placeholder="e.g. Dr. Jane Williams">
@@ -94,7 +94,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
                                     <i class="fa-solid fa-stethoscope"></i>
                                 </span>
-                                <input type="text" id="position" th:field="*{position}" required
+                                <input type="text" id="position" th:field="*{position}" required minlength="2" maxlength="30"
                                        pattern="^[A-Za-z\s\-\,\/]+$" title="Please enter a valid position (letters, spaces, and basic punctuation only)"
                                        class="input-field !pl-12"
                                        placeholder="e.g. Attending Physician, Surgeon">
