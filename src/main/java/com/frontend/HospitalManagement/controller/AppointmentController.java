@@ -56,11 +56,11 @@ public String showBookingForm(@RequestParam Integer ssn, Model model) {
 
 @PostMapping("/appointments/save")
 public String saveAppointment(@ModelAttribute AppointmentCreateDto dto, RedirectAttributes ra) {
-    boolean success = patientService.bookAppointment(dto);
-    if (success) {
+    String result = patientService.bookAppointment(dto);
+    if ("SUCCESS".equals(result)) {
         ra.addFlashAttribute("successMessage", "Appointment booked successfully!");
     } else {
-        ra.addFlashAttribute("errorMessage", "Failed to book appointment. Please check IDs.");
+        ra.addFlashAttribute("errorMessage", result);
     }
     return "redirect:/patients/" + dto.getPatientSsn() + "/appointments";
 }

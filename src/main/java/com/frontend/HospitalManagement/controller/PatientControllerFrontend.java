@@ -50,12 +50,12 @@ public class PatientControllerFrontend {
             @ModelAttribute PatientAddDto dto,
             RedirectAttributes redirectAttributes) {
 
-        boolean success = patientService.addPatient(dto);
+        String result = patientService.addPatient(dto);
 
-        if (success) {
+        if ("SUCCESS".equals(result)) {
             redirectAttributes.addFlashAttribute("successMessage", "Patient added successfully!");
         } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed to add patient. Please check the details and try again.");
+            redirectAttributes.addFlashAttribute("errorMessage", result);
         }
 
         return "redirect:/patients"; 

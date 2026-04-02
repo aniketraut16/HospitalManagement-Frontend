@@ -85,7 +85,7 @@
 
                 <div class="form-group">
                     <label>Appointment ID</label>
-                    <input type="number" th:field="*{appointmentId}" placeholder="Unique ID (e.g. 5001)" required />
+                    <input type="number" th:field="*{appointmentId}" placeholder="Unique ID (e.g. 5001)" required min="1" max="999999999"/>
                 </div>
 
                 <div class="form-group">

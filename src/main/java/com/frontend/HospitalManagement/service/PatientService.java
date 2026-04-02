@@ -73,7 +73,18 @@ public class PatientService {
 
 
     // ── Add a new patient ─────────────────────────────────────
-    public boolean addPatient(PatientAddDto dto) {
+    public String addPatient(PatientAddDto dto) {
+
+        if (dto.getPhone() != null && dto.getPhone().replaceAll("\\D", "").length() > 10) {
+            return "Phone number exceeds 10 digits";
+        }
+
+        try {
+            webClient.get().uri("/allPhysician/" + dto.getPcpId())
+                    .retrieve().toBodilessEntity().block();
+        } catch (Exception e) {
+            return "invalid physician which does not exists";
+        }
 
         String requestBody = String.format("""
                 {
@@ -102,11 +113,11 @@ public class PatientService {
                     .toBodilessEntity()
                     .block();
 
-            return true;
+            return "SUCCESS";
 
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return "Failed to add patient. Please check the details and try again.";
         }
     }
 
@@ -296,7 +307,31 @@ public class PatientService {
     }
 
     // ── Book a new appointment ────────────────────────────────
-    public boolean bookAppointment(AppointmentCreateDto dto) {
+    public String bookAppointment(AppointmentCreateDto dto) {
+
+        // Validate physician exists
+        try {
+            webClient.get()
+                    .uri("/allPhysician/" + dto.getPhysicianId())
+                    .retrieve()
+                    .toBodilessEntity()
+                    .block();
+        } catch (Exception e) {
+            return "select from existing physician and nurse";
+        }
+
+        // Validate nurse exists (if provided)
+        if (dto.getNurseId() != null) {
+            try {
+                webClient.get()
+                        .uri("/nurses/" + dto.getNurseId())
+                        .retrieve()
+                        .toBodilessEntity()
+                        .block();
+            } catch (Exception e) {
+                return "select from existing physician and nurse";
+            }
+        }
 
         String json = String.format("""
                 {
@@ -327,11 +362,11 @@ public class PatientService {
                     .toBodilessEntity()
                     .block();
 
-            return true;
+            return "SUCCESS";
 
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return "Failed to book appointment. Please check IDs.";
         }
     }
 }
